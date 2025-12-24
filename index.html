@@ -1,30 +1,28 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>無料パスワード強度チェッカー</title>
-    <!-- Roboto Font from Google Fonts -->
+    <title>AI時代のパスワード強度チェッカー & 解析ツール Pro (2025 Edition)</title>
+    
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap" rel="stylesheet">
-    <!-- Font Awesome is no longer strictly necessary but kept for potential fallback or other icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Highcharts -->
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <script src="https://code.highcharts.com/themes/grid-light.js"></script>
+
     <style>
         :root {
-            --bg-color: #ffffff;
-            --text-color: #202124;
-            --input-bg: #f1f3f4;
-            --input-border: #dadce0;
-            --button-bg: #1a73e8;
-            --button-text: #ffffff;
-            --secondary-text: #5f6368;
-            --icon-color: #5f6368;
-            --popup-bg: #3c4043;
-            --popup-text: #e8eaed;
-            --table-header-bg: #e8eaed;
-            --table-border: #dadce0;
-            --link-color: #1a73e8;
             --color-step1: #ff0000;
             --color-step2: #ff4500;
             --color-step3: #ff8c00;
@@ -35,573 +33,561 @@
             --color-step8: #1e90ff;
             --color-step9: #4169e1;
             --color-step10: #7f00ff;
-            --color-text-light: #ffffff;
-            --color-text-dark: #202124;
         }
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-color: #202124;
-                --text-color: #e8eaed;
-                --input-bg: #303134;
-                --input-border: #5f6368;
-                --button-bg: #8ab4f8;
-                --button-text: #202124;
-                --secondary-text: #9aa0a6;
-                --icon-color: #9aa0a6;
-                --popup-bg: #e8eaed;
-                --popup-text: #202124;
-                --table-header-bg: #3c4043;
-                --table-border: #5f6368;
-                --link-color: #8ab4f8;
-                --color-text-dark: #202124;
-            }
-        }
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Roboto', sans-serif;
-        }
+
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.6;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            opacity: 0;
-            animation: mainFadeIn 0.6s ease-out forwards;
+            font-family: 'Roboto', 'Noto Sans JP', sans-serif;
+            background-color: #f8f9fa;
+            transition: background-color 0.3s, color 0.3s;
+            padding-bottom: 80px;
         }
-        @keyframes mainFadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .container {
-            max-width: 700px;
-            width: 100%;
-            background-color: var(--bg-color);
-            padding: 25px;
-            border-radius: 8px;
+
+        [data-bs-theme="dark"] body {
+            background-color: #212529;
+            color: #f8f9fa;
         }
-        h1 {
-            text-align: center;
-            margin-bottom: 30px;
-            color: var(--text-color);
-            font-weight: 500;
+
+        .main-container {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 20px;
         }
-        .fade-in-element { opacity: 0; animation: elementFadeIn 0.5s ease-out forwards; }
-        @keyframes elementFadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .password-wrapper { position: relative; margin-bottom: 10px; }
-        #passwordInput {
-            width: 100%;
-            padding: 12px 40px 12px 15px;
-            border: 1px solid var(--input-border);
-            border-radius: 4px;
-            font-size: 1rem;
-            background-color: var(--input-bg);
-            color: var(--text-color);
-            font-family: 'Roboto', sans-serif;
-        }
-        #passwordInput:focus {
-            outline: none;
-            border-color: var(--link-color);
-            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
-        }
-        #togglePassword {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--icon-color);
-            padding: 5px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2em;
-        }
-        .strength-bar-container {
-            width: 100%;
-            height: 6px;
-            background-color: var(--input-bg);
-            border-radius: 3px;
-            margin-bottom: 15px;
+
+        .card {
+            border: 1px solid rgba(0,0,0,0.125);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+            transition: transform 0.2s, background-color 0.3s, border-color 0.3s;
+            border-radius: 12px;
             overflow: hidden;
         }
+        [data-bs-theme="dark"] .card {
+            border-color: rgba(255,255,255,0.15);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        
+        .result-card {
+            padding: 25px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 15px 0;
+            word-break: break-word;
+            line-height: 1.2;
+        }
+        
+        .result-label {
+            font-size: 0.95rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+        [data-bs-theme="dark"] .result-label { color: #adb5bd; }
+
+        .strength-bar-container {
+            height: 12px;
+            background-color: #e9ecef;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+        [data-bs-theme="dark"] .strength-bar-container {
+            background-color: #343a40;
+        }
+
         .strength-bar-indicator {
             height: 100%;
             width: 0%;
-            background-color: var(--input-border);
-            border-radius: 3px;
-            transition: width 0.4s ease-out, background-color 0.4s ease-out;
+            transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.5s ease;
         }
-        .privacy-notice {
-            display: flex;
-            align-items: center;
+
+        .crit-badge {
             font-size: 0.85rem;
-            color: var(--secondary-text);
-            margin-bottom: 20px;
-        }
-        .privacy-notice .icon {
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            width: 18px;
-            height: 18px;
-            background-color: #69b371;
-            color: var(--color-text-light);
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-        .privacy-notice .icon svg {
-            width: 12px;
-            height: 12px;
-        }
-        .criteria {
-            list-style: none;
-            padding: 0;
-            margin-bottom: 25px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-        }
-        .criterion {
-            display: flex;
-            align-items: center;
-            font-size: 0.9rem;
-            color: var(--secondary-text);
-        }
-        .criterion .icon {
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            width: 18px;
-            height: 18px;
-            border: 1px solid var(--input-border);
-            color: var(--icon-color);
-            background-color: transparent;
-            border-radius: 50%;
-            margin-right: 8px;
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-        }
-         .criterion .icon svg {
-            width: 10px;
-            height: 10px;
-        }
-        .criterion.met .icon {
-            background-color: #69b371;
-            color: var(--color-text-light);
-            border-color: #69b371;
-        }
-        .results-section {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid var(--input-border);
-        }
-        .result-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-            font-size: 1rem;
-            position: relative; /* ポップアップの基準点 */
-        }
-        .result-item .icon {
-            color: var(--icon-color);
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .result-item .info-icon { /* result-item内のinfo-icon */
-            color: var(--icon-color);
-            margin-left: 8px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-        }
-        .result-item .value {
-            font-weight: 500;
-            margin-left: auto;
-            padding: 3px 8px;
-            border-radius: 4px;
-            color: var(--text-color);
-        }
-
-        .table-toggle-buttons {
-            display: flex; flex-wrap: wrap; gap: 10px;
-            margin-top: 20px; margin-bottom: 10px;
-            align-items: center;
-        }
-        .table-toggle-buttons > div { /* 各ボタンとアイコンのコンテナを relative に */
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .table-toggle-buttons button {
-            background-color: var(--input-bg); color: var(--secondary-text);
-            border: 1px solid var(--input-border); padding: 8px 15px;
-            border-radius: 4px; cursor: pointer; font-size: 0.9rem;
-            transition: background-color 0.2s ease, border-color 0.2s ease;
-            position: relative; /* アイコンを内部に配置するための基準 */
-        }
-        .table-toggle-buttons button:hover { background-color: var(--input-border); }
-
-        /* ボタン内の情報アイコン */
-        .table-toggle-buttons button .info-icon {
-            position: absolute;
-            right: 8px; /* ボタン右端からの位置 */
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--icon-color);
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-        }
-        /* アイコン分のパディングをボタンに追加 */
-        #toggleCrackTimeTableBtn {
-            padding-right: 30px !important; /* アイコンスペース確保 */
-        }
-
-
-        .info-popup {
-            position: absolute;
-            background-color: var(--popup-bg); color: var(--popup-text);
-            padding: 10px 15px; border-radius: 6px; font-size: 0.88rem;
-            z-index: 10; width: max-content; max-width: 380px;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.25);
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.25s ease-out, visibility 0s linear 0.25s;
-        }
-        .info-popup strong {
-            font-weight: 500;
-            color: var(--link-color);
-             display: block; margin-bottom: 5px;
-        }
-        @media (prefers-color-scheme: dark) {
-            .info-popup strong {
-                color: var(--link-color);
-            }
-        }
-        .info-popup ul {
-            list-style-type: disc;
-            padding-left: 20px;
-            margin-top: 5px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            margin-right: 5px;
             margin-bottom: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: #e9ecef;
+            color: #6c757d;
+            border: 1px solid transparent;
+            transition: all 0.3s;
         }
-        .info-popup li {
-            margin-bottom: 3px;
+        [data-bs-theme="dark"] .crit-badge {
+            background-color: #343a40;
+            color: #adb5bd;
         }
-
-        .info-popup.visible {
-            opacity: 1;
-            visibility: visible;
-            transition-delay: 0s;
+        .crit-badge.met {
+            background-color: #d1e7dd;
+            color: #0f5132;
+            border-color: #badbcc;
         }
-        .info-popup:not(.visible) {
-            transition: opacity 0.25s ease-out, visibility 0s linear 0.25s;
-        }
-        
-        .info-popup.align-left { left: 0; }
-        .info-popup.align-right { right: 0; } /* result-item用 */
-        /* table-toggle-buttons内のポップアップはボタンの左端に合わせるのを基本とする */
-        .table-toggle-buttons .info-popup {
-            left:0; /* ボタンの左端から開始 */
-        }
-
-
-        .info-popup.popup-above { bottom: calc(100% + 8px); } /* ボタンの上に表示、少し間隔 */
-        .info-popup.popup-below { top: calc(100% + 8px); }   /* ボタンの下に表示、少し間隔 */
-
-
-        .info-popup::after {
-            content: ''; position: absolute;
-            border-width: 6px; border-style: solid;
-        }
-        .info-popup.popup-below.align-left::after,
-        .table-toggle-buttons .info-popup.popup-below::after { /* table-toggle-buttons用 */
-            bottom: 100%; left: 15px;
-            border-color: transparent transparent var(--popup-bg) transparent;
-        }
-         .info-popup.popup-above.align-left::after,
-         .table-toggle-buttons .info-popup.popup-above::after { /* table-toggle-buttons用 */
-            top: 100%; left: 15px;
-            border-color: var(--popup-bg) transparent transparent transparent;
-        }
-        .info-popup.popup-above.align-right::after { /* result-item用 */
-            top: 100%; right: 15px;
-            border-color: var(--popup-bg) transparent transparent transparent;
+        [data-bs-theme="dark"] .crit-badge.met {
+            background-color: #051b11;
+            color: #75b798;
+            border-color: #0f5132;
         }
 
-
-        .strength-step1  { background-color: var(--color-step1);  color: var(--color-text-light); }
-        .strength-step2  { background-color: var(--color-step2);  color: var(--color-text-light); }
-        .strength-step3  { background-color: var(--color-step3);  color: var(--color-text-dark);  }
-        .strength-step4  { background-color: var(--color-step4);  color: var(--color-text-dark);  }
-        .strength-step5  { background-color: var(--color-step5);  color: var(--color-text-dark);  }
-        .strength-step6  { background-color: var(--color-step6);  color: var(--color-text-dark);  }
-        .strength-step7  { background-color: var(--color-step7);  color: var(--color-text-light); }
-        .strength-step8  { background-color: var(--color-step8);  color: var(--color-text-light); }
-        .strength-step9  { background-color: var(--color-step9);  color: var(--color-text-light); }
-        .strength-step10 { background-color: var(--color-step10); color: var(--color-text-light); }
-        
-        .table-container {
-            display: none; opacity: 0; margin-top: 10px;
-            width: 100%; overflow-x: auto;
-            transition: opacity 0.5s ease-out;
+        .device-list-item {
+            display: flex;
+            flex-direction: column;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            font-size: 0.9rem;
         }
-        .table-container.visible { display: block; opacity: 1; }
-        .info-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 300px; }
-        .info-table th, .info-table td { border: 1px solid var(--table-border); padding: 8px 10px; text-align: left; }
-        .info-table th { background-color: var(--table-header-bg); font-weight: 500; }
-        #passwordStrengthTable th, #passwordStrengthTable td { text-align: center; }
-        #passwordStrengthTable td:first-child { font-weight: 500; background-color: var(--table-header-bg); }
-        #passwordStrengthTable td.color-step1  { background-color: var(--color-step1);  color: var(--color-text-light); }
-        #passwordStrengthTable td.color-step2  { background-color: var(--color-step2);  color: var(--color-text-light); }
-        #passwordStrengthTable td.color-step3  { background-color: var(--color-step3);  color: var(--color-text-dark);  }
-        #passwordStrengthTable td.color-step4  { background-color: var(--color-step4);  color: var(--color-text-dark);  }
-        #passwordStrengthTable td.color-step5  { background-color: var(--color-step5);  color: var(--color-text-dark);  }
-        #passwordStrengthTable td.color-step6  { background-color: var(--color-step6);  color: var(--color-text-dark);  }
-        #passwordStrengthTable td.color-step7  { background-color: var(--color-step7);  color: var(--color-text-light); }
-        #passwordStrengthTable td.color-step8  { background-color: var(--color-step8);  color: var(--color-text-light); }
-        #passwordStrengthTable td.color-step9  { background-color: var(--color-step9);  color: var(--color-text-light); }
-        #passwordStrengthTable td.color-step10 { background-color: var(--color-step10); color: var(--color-text-light); }
-        .result-item .value.value-updated { animation: valueFadeIn 0.3s ease-out; }
-        @keyframes valueFadeIn { from { opacity: 0.3; } to { opacity: 1; } }
+        [data-bs-theme="dark"] .device-list-item {
+            border-bottom-color: rgba(255,255,255,0.1);
+        }
+        .device-list-item:last-child {
+            border-bottom: none;
+        }
+        .device-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        .device-name {
+            font-weight: 500;
+            color: #6c757d;
+        }
+        [data-bs-theme="dark"] .device-name {
+            color: #adb5bd;
+        }
+        .device-time {
+            font-weight: 700;
+            text-align: right;
+        }
+        .device-desc {
+            font-size: 0.75rem;
+            color: #999;
+            line-height: 1.3;
+        }
+        [data-bs-theme="dark"] .device-desc {
+            color: #6c757d;
+        }
+
+        .popover { max-width: 400px; }
+
+        /* Table Styling */
+        .table-responsive {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        th {
+            position: sticky;
+            top: 0;
+            background-color: #f8f9fa;
+            z-index: 10;
+        }
+        [data-bs-theme="dark"] th {
+            background-color: #212529;
+            color: #fff;
+        }
+
+        /* Chart Reset Button */
+        .chart-reset-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+        }
+
+        /* Color Utility Classes */
+        .color-step1 { background-color: var(--color-step1) !important; color: white !important; }
+        .color-step2 { background-color: var(--color-step2) !important; color: white !important; }
+        .color-step3 { background-color: var(--color-step3) !important; color: #212529 !important; }
+        .color-step4 { background-color: var(--color-step4) !important; color: #212529 !important; }
+        .color-step5 { background-color: var(--color-step5) !important; color: #212529 !important; }
+        .color-step6 { background-color: var(--color-step6) !important; color: #212529 !important; }
+        .color-step7 { background-color: var(--color-step7) !important; color: white !important; }
+        .color-step8 { background-color: var(--color-step8) !important; color: white !important; }
+        .color-step9 { background-color: var(--color-step9) !important; color: white !important; }
+        .color-step10 { background-color: var(--color-step10) !important; color: white !important; }
+
+        .text-step1 { color: var(--color-step1); }
+        .text-step2 { color: var(--color-step2); }
+        .text-step3 { color: var(--color-step3); }
+        .text-step4 { color: var(--color-step4); }
+        .text-step5 { color: var(--color-step5); }
+        .text-step6 { color: var(--color-step6); }
+        .text-step7 { color: var(--color-step7); }
+        .text-step8 { color: var(--color-step8); }
+        .text-step9 { color: var(--color-step9); }
+        .text-step10 { color: var(--color-step10); }
+
+        #passwordInput {
+            font-size: 1.3rem;
+            padding: 18px;
+            letter-spacing: 1px;
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1 class="fade-in-element" style="animation-delay: 0s;">無料パスワード強度チェッカー</h1>
-        <div class="password-wrapper fade-in-element" style="animation-delay: 0.1s;">
-            <input type="password" id="passwordInput" placeholder="パスワードを入力してください">
-            <button id="togglePassword" aria-label="パスワードを表示/非表示">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
-                  <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
-                  <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
-                </svg>
+
+    <nav class="navbar navbar-expand-lg sticky-top bg-body-tertiary shadow-sm">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+                <i class="bi bi-shield-lock-fill text-primary fs-3"></i>
+                <span class="fw-bold fs-4">PasswordCheck Pro</span>
+            </a>
+            <button class="btn btn-outline-secondary" id="themeToggle" title="テーマ切り替え">
+                <i class="bi bi-circle-half"></i>
             </button>
         </div>
-        <div class="strength-bar-container fade-in-element" style="animation-delay: 0.15s;">
-            <div class="strength-bar-indicator" id="strengthBarIndicator"></div>
-        </div>
-        <div class="privacy-notice fade-in-element" style="animation-delay: 0.2s;">
-            <span class="icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2" viewBox="0 0 16 16">
-                  <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0"/>
-                </svg>
-            </span>
-            <span>パスワードはサーバに保存されることはなく、またどのような方法でも共有されることはありません。ご安心ください。</span>
-        </div>
-        <div class="criteria fade-in-element" style="animation-delay: 0.3s;">
-            <div class="criterion" id="lengthCheck"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg></span><span>8文字以上</span></div>
-            <div class="criterion" id="uppercaseCheck"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg></span><span>大文字を含む</span></div>
-            <div class="criterion" id="lowercaseCheck"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg></span><span>小文字を含む</span></div>
-            <div class="criterion" id="numberCheck"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg></span><span>数字を含む</span></div>
-            <div class="criterion" id="symbolCheck"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg></span><span>記号を含む</span></div>
-        </div>
-        <div class="results-section fade-in-element" style="animation-delay: 0.4s;">
-            <div class="result-item">
-                <span class="icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clock-history" viewBox="0 0 16 16">
-                      <path d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022zm2.004.45a7 7 0 0 0-.985-.299l.219-.976q.576.129 1.126.342zm1.37.71a7 7 0 0 0-.439-.27l.493-.87a8 8 0 0 1 .979.654l-.615.789a7 7 0 0 0-.418-.302zm1.834 1.79a7 7 0 0 0-.653-.796l.724-.69q.406.429.747.91zm.744 1.352a7 7 0 0 0-.214-.468l.893-.45a8 8 0 0 1 .45 1.088l-.95.313a7 7 0 0 0-.179-.483m.53 2.507a7 7 0 0 0-.1-1.025l.985-.17q.1.58.116 1.17zm-.131 1.538q.05-.254.081-.51l.993.123a8 8 0 0 1-.23 1.155l-.964-.267q.069-.247.12-.501m-.952 2.379q.276-.436.486-.908l.914.405q-.24.54-.555 1.038zm-.964 1.205q.183-.183.35-.378l.758.653a8 8 0 0 1-.401.432z"/>
-                      <path d="M8 1a7 7 0 1 0 4.95 11.95l.707.707A8.001 8.001 0 1 1 8 0z"/>
-                      <path d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5"/>
-                    </svg>
-                </span>
-                <span>パスワード解析時間</span>
-                <span class="info-icon" id="timeInfoBtn" aria-label="解析時間の情報">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
-                      <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
-                    </svg>
-                </span>
-                <span class="value" id="crackTime">-</span>
-                <div class="info-popup align-left popup-above" id="timeInfoPopup">
-                    <strong>パスワード解析時間について</strong>
-                    入力されたパスワードを解読するのに要する時間の目安です。<br>
-                    <strong style="margin-top:8px;">計算の前提:</strong>
-                    <ul>
-                        <li>パスワードの実際の構成 (長さ、文字種、辞書語、繰り返し、キーボードパターン等) を評価します。</li>
-                        <li>攻撃速度は、強力なものを想定し、**毎秒1兆回 (10<sup>12</sup>回)** の試行を仮定しています。</li>
-                    </ul>
-                    この時間は、下の「パスワード解析時間の目安表」とは計算の前提が異なります。目安表は理想的なランダム性を仮定した理論値です。
+    </nav>
+
+    <div class="main-container">
+        
+        <!-- Input Section -->
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-8">
+                <div class="text-center mb-4">
+                    <h1 class="fw-light mb-2">AI時代のパスワード強度チェッカー</h1>
+                    <p class="fs-4 text-danger fw-bold mb-3">そのパスワード、1秒で破られませんか？</p>
+                    <p class="text-muted">あなたのパスワードは、AIの進化に耐えられますか？<br>Powered by Advanced Entropy & Hashrate Analysis (2025 Edition)</p>
                 </div>
-            </div>
-            <div class="result-item">
-                <span class="icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-shield-shaded" viewBox="0 0 16 16">
-                      <path fill-rule="evenodd" d="M8 14.933a1 1 0 0 0 .1-.025q.114-.034.294-.118c.24-.113.547-.29.893-.533a10.7 10.7 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.8 11.8 0 0 1-2.517 2.453 7 7 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7 7 0 0 1-1.048-.625 11.8 11.8 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 63 63 0 0 1 5.072.56"/>
-                    </svg>
-                </span>
-                <span>パスワード強度</span>
-                <span class="info-icon" id="strengthInfoBtn" aria-label="パスワード強度の情報">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
-                      <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
-                    </svg>
-                </span>
-                <span class="value" id="passwordStrength">-</span>
-                <div class="info-popup align-left popup-above" id="strengthInfoPopup">
-                    <strong>パスワード強度について</strong><br>
-                    この強度は、上記の「パスワード解析時間」と連動しています。「パスワード解析時間」は、以下の要素を考慮して計算された、より現実的な目安です：<br>
-                    - パスワードの長さ、文字種（大文字、小文字、数字、記号）<br>
-                    - 辞書に載っている単語や一般的な名前の使用<br>
-                    - キーボードの並び（例: "qwerty"）や連続・繰り返し文字（例: "abc", "111"）<br>
-                    - 一般的な日付パターン<br>
-                    上記を基に実効エントロピーを算出し、強力な攻撃（毎秒1兆回の試行を仮定）で破られるまでの時間から強度を判定しています。
-                </div>
-            </div>
-            <div class="result-item">
-                <span class="icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calculator-fill" viewBox="0 0 16 16">
-                      <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2zm2 .5v2a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 0-.5-.5h-7a.5.5 0 0 0-.5.5m0 4v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5M4.5 9a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM4 12.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5M7.5 6a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM7 9.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5m.5 2.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM10 6.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5m.5 2.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5z"/>
-                    </svg>
-                </span>
-                <span>エントロピー</span>
-                <span class="info-icon" id="entropyInfoBtn" aria-label="エントロピーとは？">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-question-circle-fill" viewBox="0 0 16 16">
-                      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.496 6.033h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286a.237.237 0 0 0 .241.247m2.325 6.443c.61 0 1.029-.394 1.029-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94 0 .533.425.927 1.01.927z"/>
-                    </svg>
-                </span>
-                <span class="value" id="entropyValue">-</span>
-                <div class="info-popup align-right popup-above" id="entropyInfoPopup">
-                    <strong>エントロピーとは？</strong><br>
-                    パスワードの「予測困難性」または「ランダム性」をビット単位で表す尺度です。数値が高いほど、パスワードを推測するのが難しくなります。<br>
-                    <strong style="margin-top:8px;">計算の考慮事項:</strong>
-                    <ul>
-                        <li>基本的な文字種（大文字、小文字、数字、記号）とパスワードの長さ。</li>
-                        <li>辞書に載っている単語や一般的な名前、日付の使用による減点。</li>
-                        <li>キーボードの並び（"qwerty"等）や連続・繰り返し文字（"abc", "111"等）による減点。</li>
-                    </ul>
-                    これらの要素を総合的に評価し、実効的なエントロピーを算出しています。
+                
+                <div class="card p-4">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text bg-body"><i class="bi bi-key fs-4"></i></span>
+                        <input type="password" id="passwordInput" class="form-control" placeholder="ここにパスワードを入力してください..." aria-label="Password">
+                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                            <i class="bi bi-eye-fill"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="strength-bar-container mb-4">
+                        <div class="strength-bar-indicator" id="strengthBarIndicator"></div>
+                    </div>
+
+                    <div class="d-flex flex-wrap justify-content-center gap-2 mb-3" id="criteriaList">
+                        <span class="crit-badge" id="lengthCheck"><i class="bi bi-x-circle"></i> 8文字以上</span>
+                        <span class="crit-badge" id="uppercaseCheck"><i class="bi bi-x-circle"></i> 大文字</span>
+                        <span class="crit-badge" id="lowercaseCheck"><i class="bi bi-x-circle"></i> 小文字</span>
+                        <span class="crit-badge" id="numberCheck"><i class="bi bi-x-circle"></i> 数字</span>
+                        <span class="crit-badge" id="symbolCheck"><i class="bi bi-x-circle"></i> 記号</span>
+                    </div>
+
+                    <div class="alert alert-light border d-flex align-items-center py-2 justify-content-center" role="alert">
+                        <i class="bi bi-shield-check text-success me-2 fs-5"></i>
+                        <div class="small text-muted">
+                            パスワードはブラウザ内で安全に処理され、外部に送信されることはありません。
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="table-toggle-buttons fade-in-element" style="animation-delay: 0.5s;">
-            <div>
-                <button id="toggleCrackTimeTableBtn">
-                    パスワード解析時間の目安表
-                    <span class="info-icon" id="crackTimeTableInfoBtn" aria-label="目安表の情報">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
-                          <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
-                        </svg>
-                    </span>
-                </button>
-                <div class="info-popup align-left popup-below" id="crackTimeTableInfoPopup">
-                    <strong>パスワード解析時間の目安表について</strong>
-                    この表は、指定された文字種のみを使用し、完全にランダムな文字列でパスワードを作成した場合の、理論的な解析時間を示します。<br>
-                    <strong style="margin-top:8px;">計算の前提:</strong>
-                    <ul>
-                        <li>攻撃者はパスワードに使用されている文字種を知っていると仮定します。</li>
-                        <li>パスワードは完全にランダムであり、辞書語、名前、キーボードパターンなどの予測可能な要素を含まないものとします。</li>
-                        <li>攻撃速度は、**毎秒10億回 (10<sup>9</sup>回)** の試行を仮定しています。</li>
-                    </ul>
-                    これはあくまで理論上の理想的な強度であり、実際のパスワードが持つ可能性のある弱点（辞書語の使用など）は考慮されていません。<br>
-                    あなたの入力したパスワードのより現実的な強度については、ページ上部の「パスワード解析時間」をご参照ください。そちらは、パスワードの具体的な内容と、より強力な攻撃（毎秒1兆回試行）を考慮して計算されています。
+
+        <!-- Main Metrics Row -->
+        <div class="row g-4 mb-5">
+            <!-- Crack Time & Device List -->
+            <div class="col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body d-flex flex-col">
+                        <div class="mb-3">
+                            <div class="result-label">
+                                解析時間 (目安)
+                                <button type="button" class="btn btn-link p-0 text-muted" data-bs-toggle="popover" data-bs-title="基準デバイスについて" data-bs-content="表示されているメインの時間は、<strong>解析リグ (RTX 5090 x8)</strong> を使用し、毎秒 <strong>約2,800億回 (280 GH/s)</strong> の総当たり攻撃を行った場合の推定時間です。<br>最新のマイニング専用機1台（約360 TH/s）の1000分の1以下の性能を基準としています。">
+                                    <i class="bi bi-info-circle-fill"></i>
+                                </button>
+                            </div>
+                            <div class="result-value" id="crackTime">-</div>
+                            <div class="badge bg-primary-subtle text-primary border border-primary-subtle mb-3">
+                                基準: 解析リグ (RTX 5090 x8) @ 280 GH/s
+                            </div>
+                        </div>
+                        
+                        <h6 class="border-bottom pb-2 mb-2 text-muted small text-uppercase fw-bold">各デバイスでの推定解析時間</h6>
+                        <div class="flex-grow-1 overflow-auto" style="max-height: 250px;">
+                            <div id="deviceTimeList">
+                                <!-- Generated by JS -->
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div>
-                <button id="toggleNumericUnitsTableBtn">英語の数値単位一覧表</button>
+            
+            <!-- Strength Level -->
+            <div class="col-lg-4">
+                <div class="card result-card">
+                    <div>
+                        <div class="result-label">
+                            強度レベル
+                            <button type="button" class="btn btn-link p-0 text-muted" data-bs-toggle="popover" data-bs-title="パスワード強度" data-bs-content="解析時間を基にした総合的な安全性評価です。文字の種類、長さ、予測可能性（辞書やキーボードパターン）から算出されます。">
+                                <i class="bi bi-info-circle-fill"></i>
+                            </button>
+                        </div>
+                        <div class="result-value" id="passwordStrength">-</div>
+                        <div class="progress mt-3" style="height: 8px;">
+                            <div class="progress-bar" id="strengthProgress" role="progressbar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <div class="result-label mb-2"><i class="bi bi-exclamation-triangle me-1"></i>検出されたパターン</div>
+                        <div id="patternList">
+                            <span class="text-muted fst-italic small">パターンは検出されていません</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div>
-                <button id="toggleStrengthLevelsTableBtn">強度一覧表</button>
+            
+            <!-- Entropy & Composition -->
+            <div class="col-lg-4">
+                <div class="card result-card">
+                    <div class="result-label">
+                        エントロピー / 構成比
+                        <button type="button" class="btn btn-link p-0 text-muted" data-bs-toggle="popover" data-bs-title="エントロピーとは？" data-bs-content="パスワードの「情報量」や「予測困難性」をビット(bit)単位で表したものです。数値が高いほどランダム性が高く、推測が困難であることを示します。<br>目安: 60bit以上で実用的、100bit以上で非常に強力。">
+                            <i class="bi bi-info-circle-fill"></i>
+                        </button>
+                    </div>
+                    <div class="result-value" id="entropyValue">-</div>
+                    <div class="small text-muted mb-4">Effective Bits</div>
+
+                    <div style="height: 200px; position: relative;">
+                        <div id="compositionChart" style="height: 100%; width: 100%;"></div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="table-container" id="crackTimeTableContainer">
-             <h3 style="text-align:center; margin-bottom:10px; font-weight:500;">パスワード解析時間の目安（文字種別・長さ別）</h3>
-            <table id="passwordStrengthTable" class="info-table">
-                <thead>
-                    <tr>
-                        <th>文字数</th>
-                        <th>数字のみ</th>
-                        <th>小文字のみ</th>
-                        <th>大文字小文字</th>
-                        <th>数字大文字小文字</th>
-                        <th>数字大文字小文字記号</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Password Strength Table rows will be generated by JavaScript -->
-                </tbody>
-            </table>
+
+        <!-- Charts Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <h3 class="mb-4 border-bottom pb-2 fw-light"><i class="bi bi-graph-up me-2"></i>詳細分析チャート</h3>
+            </div>
+            
+            <!-- Transition Chart -->
+            <div class="col-lg-12 mb-4">
+                <div class="card">
+                    <div class="card-body" style="position: relative;">
+                        <button class="btn btn-sm btn-outline-secondary chart-reset-btn" id="resetTransitionChart">
+                            <i class="bi bi-arrow-counterclockwise"></i> リセット
+                        </button>
+                        <div id="transitionChart" style="height: 350px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Device Crack Time Comparison Chart -->
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div id="deviceTimeChart" style="height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hashrate Comparison Chart -->
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div id="hashrateChart" style="height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="table-container" id="numericUnitsTableContainer">
-            <h3 style="text-align:center; margin-bottom:10px; font-weight:500;">英語の数値単位</h3>
-            <table id="numericUnitsTable" class="info-table">
-                <thead>
-                    <tr>
-                        <th>単位</th>
-                        <th>10の何乗</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Numeric Units Table rows will be generated by JavaScript -->
-                </tbody>
-            </table>
+
+        <!-- Detailed Tables Section -->
+        <div class="row">
+            <div class="col-12">
+                <h3 class="mb-4 border-bottom pb-2 fw-light"><i class="bi bi-table me-2"></i>データ・基準表</h3>
+                
+                <div class="accordion" id="dataTablesAccordion">
+                    <!-- Crack Time Table -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCrackTime">
+                                <i class="bi bi-clock-history me-2"></i>パスワード解析時間の目安表 (理論値: 10^9 試行/秒) - 全323パターン
+                            </button>
+                        </h2>
+                        <div id="collapseCrackTime" class="accordion-collapse collapse show" data-bs-parent="#dataTablesAccordion">
+                            <div class="accordion-body">
+                                <p class="small text-muted">
+                                    <strong>注意:</strong> この表は、攻撃者が「使用された文字種」を完全に特定しており、かつパスワードが「完全にランダム」であると仮定した場合の理論値です。
+                                    攻撃速度は標準的な攻撃を想定した <strong>毎秒10億回 (10<sup>9</sup>)</strong> で計算されています。
+                                </p>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered text-center" id="passwordStrengthTable">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th style="min-width: 60px;">文字数</th>
+                                                <th>数字のみ (10種)</th>
+                                                <th>小文字のみ (26種)</th>
+                                                <th>大文字小文字 (52種)</th>
+                                                <th>数字大文字小文字 (62種)</th>
+                                                <th>数字大文字小文字記号 (95種)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody><!-- JS Generated --></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Strength Levels Table -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStrength">
+                                <i class="bi bi-speedometer2 me-2"></i>強度レベルとエントロピーの基準
+                            </button>
+                        </h2>
+                        <div id="collapseStrength" class="accordion-collapse collapse" data-bs-parent="#dataTablesAccordion">
+                            <div class="accordion-body">
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered" id="strengthLevelsTable">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>強度レベル (エントロピー目安)</th>
+                                                <th>カラーコード</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody><!-- JS Generated --></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Numeric Units Table -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUnits">
+                                <i class="bi bi-123 me-2"></i>英語の数値単位一覧表 (省略なし)
+                            </button>
+                        </h2>
+                        <div id="collapseUnits" class="accordion-collapse collapse" data-bs-parent="#dataTablesAccordion">
+                            <div class="accordion-body">
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-striped" id="numericUnitsTable">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>単位 (English Name)</th>
+                                                <th>値 (10の何乗)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody><!-- JS Generated --></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="table-container" id="strengthLevelsTableContainer">
-            <h3 style="text-align:center; margin-bottom:10px; font-weight:500;">パスワード強度レベルの目安</h3>
-            <table id="strengthLevelsTable" class="info-table">
-                <thead>
-                    <tr>
-                        <th>強度レベル (エントロピー目安)</th>
-                        <th>背景色</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Strength Levels Table rows will be generated by JavaScript -->
-                </tbody>
-            </table>
-        </div>
+
     </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- 1. Variables & Constants Declaration ---
+            
+            // UI Elements
             const passwordInput = document.getElementById('passwordInput');
             const togglePassword = document.getElementById('togglePassword');
             const crackTimeElement = document.getElementById('crackTime');
             const passwordStrengthElement = document.getElementById('passwordStrength');
             const entropyValueElement = document.getElementById('entropyValue');
             const strengthBarIndicator = document.getElementById('strengthBarIndicator');
+            const strengthProgress = document.getElementById('strengthProgress');
+            const deviceTimeListElement = document.getElementById('deviceTimeList');
+            const resetTransitionChartBtn = document.getElementById('resetTransitionChart');
+            
             const lengthCheck = document.getElementById('lengthCheck');
             const uppercaseCheck = document.getElementById('uppercaseCheck');
             const lowercaseCheck = document.getElementById('lowercaseCheck');
             const numberCheck = document.getElementById('numberCheck');
             const symbolCheck = document.getElementById('symbolCheck');
-            const timeInfoBtn = document.getElementById('timeInfoBtn');
-            const strengthInfoBtn = document.getElementById('strengthInfoBtn');
-            const entropyInfoBtn = document.getElementById('entropyInfoBtn');
-            const crackTimeTableInfoBtn = document.getElementById('crackTimeTableInfoBtn'); 
 
-            const timeInfoPopup = document.getElementById('timeInfoPopup');
-            const strengthInfoPopup = document.getElementById('strengthInfoPopup');
-            const entropyInfoPopup = document.getElementById('entropyInfoPopup');
-            const crackTimeTableInfoPopup = document.getElementById('crackTimeTableInfoPopup');
+            // Theme Toggle
+            const themeToggle = document.getElementById('themeToggle');
+            const htmlElement = document.documentElement;
+            const themeIcon = themeToggle.querySelector('i');
 
-            const toggleCrackTimeTableBtn = document.getElementById('toggleCrackTimeTableBtn');
-            const crackTimeTableContainer = document.getElementById('crackTimeTableContainer');
+            // Chart Variables
+            let compositionChart;
+            let deviceTimeChart;
+            let hashrateChart;
+            let transitionChart;
+            let entropyHistory = [];
 
-            const toggleNumericUnitsTableBtn = document.getElementById('toggleNumericUnitsTableBtn');
-            const numericUnitsTableContainer = document.getElementById('numericUnitsTableContainer');
-            const numericUnitsTableBody = document.querySelector('#numericUnitsTable tbody');
+            // Device Constants with Descriptions
+            // Ordered by speed (ascending) for better chart visualization
+            const DEVICES = [
+                { 
+                    name: 'PC CPU (Core Ultra 9 285K)', 
+                    speed: 300_000_000n, // ~300 MH/s
+                    color: '#17a2b8',
+                    desc: 'CPUは汎用処理に特化しているため、ハッシュ計算のような単純作業は苦手です。'
+                },
+                { 
+                    name: 'Android (Snapdragon 8 Elite)', 
+                    speed: 1_000_000_000n, // ~1 GH/s
+                    color: '#a4c639',
+                    desc: '最新のモバイルSoC。CPU/GPUをフル活用してもASICには遠く及びません。'
+                },
+                { 
+                    name: 'iPhone 17 Pro (A19 Pro)', 
+                    speed: 1_200_000_000n, // ~1.2 GH/s
+                    color: '#6c757d',
+                    desc: 'A19 Pro（予測値）の並列演算能力による推計。効率は高いが絶対的なパワーは限定的。'
+                },
+                { 
+                    name: 'Mac (M4 Max)', 
+                    speed: 4_000_000_000n, // ~4 GH/s
+                    color: '#20c997',
+                    desc: '統合された強力なGPUとメモリ帯域により、民生用PCとしては高い数値を出し得ます。'
+                },
+                { 
+                    name: 'GPU (RTX 5090)', 
+                    speed: 35_000_000_000n, // ~35 GH/s
+                    color: '#28a745',
+                    desc: '単体GPUでは最強クラス。RTX 4090の約1.5倍〜2倍の性能が見込まれます。'
+                },
+                { 
+                    name: '解析リグ (RTX 5090 x8)', 
+                    speed: 280_000_000_000n, // ~280 GH/s
+                    color: '#ffc107',
+                    desc: 'RTX 5090を8枚並列させた構成。最新のマイニング専用機1台（約360 TH/s）の1000分の1以下です。'
+                },
+                { 
+                    name: 'ボットネット (10k Nodes)', 
+                    speed: 50_000_000_000_000n, // ~50 TH/s
+                    color: '#fd7e14',
+                    desc: '一般的なPC 1万台を乗っ取った場合。個々のパワーは弱くても、数で専用機数台分に匹敵します。'
+                },
+                { 
+                    name: 'スパコン (Frontier級)', 
+                    speed: 1_100_000_000_000_000_000n, // ~1.1 EH/s
+                    color: '#dc3545',
+                    desc: '3.7万基超のGPUを連結。理論上は世界最強ですが、ビットコイン網全体の0.1%程度です。'
+                }
+            ];
 
-            const toggleStrengthLevelsTableBtn = document.getElementById('toggleStrengthLevelsTableBtn');
-            const strengthLevelsTableContainer = document.getElementById('strengthLevelsTableContainer');
-            const strengthLevelsTableBody = document.querySelector('#strengthLevelsTable tbody');
+            const ATTEMPTS_PER_SECOND_MAIN = DEVICES[5].speed; // 280 GH/s (Rig)
+            const SECONDS_PER_YEAR = 365n * 24n * 60n * 60n;
+            const UNCENTILLION_POWER = 306;
+            const MAX_DISPLAYABLE_UNCENTILLION_YEARS = 999n * (10n ** BigInt(UNCENTILLION_POWER));
+            const MAX_DISPLAYABLE_UNCENTILLION_SECONDS = MAX_DISPLAYABLE_UNCENTILLION_YEARS * SECONDS_PER_YEAR;
 
-            let previousCrackTimeText = crackTimeElement.textContent;
-            let previousPasswordStrengthText = passwordStrengthElement.textContent;
-            let previousEntropyValueText = entropyValueElement.textContent;
-
-            const ATTEMPTS_PER_SECOND_ADVANCED = 1_000_000_000_000n; 
-
-            // --- SVG Icon Definitions ---
-            const EYE_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16"><path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/><path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/></svg>`;
-            const EYE_SLASH_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-slash-fill" viewBox="0 0 16 16"><path d="m10.79 12.912-1.614-1.615a3.5 3.5 0 0 1-4.474-4.474l-2.06-2.06C.938 6.278 0 8 0 8s3 5.5 8 5.5a7 7 0 0 0 2.79-.588M5.21 3.088A7 7 0 0 1 8 2.5c5 0 8 5.5 8 5.5s-.939 1.721-2.641 3.238l-2.062-2.062a3.5 3.5 0 0 0-4.474-4.474z"/><path d="M5.525 7.646a2.5 2.5 0 0 0 2.829 2.829zm4.95.708-2.829-2.83a2.5 2.5 0 0 1 2.829 2.829zm3.171 6-12-12 .708-.708 12 12z"/></svg>`;
-            const CHECK_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2" viewBox="0 0 16 16"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0"/></svg>`;
-            const X_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg>`;
-            
             const COMMON_PASSWORDS = [
                 '123456', 'password', '123456789', '12345678', '12345', '111111', '1234567', 'qwerty', 'asdfgh',
                 '123123', 'iloveyou', '000000', 'admin', 'login', 'user', 'test', 'secret', 'p@$$w0rd',
@@ -616,190 +602,16 @@
             ];
 
             const KEYBOARD_PATTERNS = [
-                'qwertyuiop', 'asdfghjkl', 'zxcvbnm',
-                'qazwsxedcrfvtgbyhnujmikolp',
-                '1234567890',
-                'qwe', 'wer', 'ert', 'rty', 'tyu', 'yui', 'uio', 'iop',
-                'asd', 'sdf', 'dfg', 'fgh', 'ghj', 'hjk', 'jkl',
-                'zxc', 'xcv', 'cvb', 'vbn', 'bnm',
-                'poiuytrewq', 'lkjhgfdsa', 'mnbvcxz',
+                'qwertyuiop', 'asdfghjkl', 'zxcvbnm', 'qazwsxedcrfvtgbyhnujmikolp', '1234567890',
+                'qwe', 'wer', 'ert', 'rty', 'tyu', 'yui', 'uio', 'iop', 'asd', 'sdf', 'dfg', 'fgh', 'ghj', 'hjk', 'jkl',
+                'zxc', 'xcv', 'cvb', 'vbn', 'bnm', 'poiuytrewq', 'lkjhgfdsa', 'mnbvcxz',
                 'qaws', 'sxde', 'dcrf', 'fvgt', 'gbYH', 'hNju', 'jmIk', 'kiOl', 'loP',
             ];
             const SYMBOL_PATTERNS = ['!@#$%', '^&*()', ')_+', '}{[]'];
-
             const REGEX_SEQUENCES_ALPHA = /(abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz)/gi;
             const REGEX_SEQUENCES_NUM = /(012|123|234|345|456|567|678|789)/g;
             const REGEX_REPEATED_3PLUS = /(.)\1\1+/g;
-            const REGEX_REPEATED_2PLUS = /(.)\1+/g;
             const REGEX_YEAR = /\b(19\d\d|20\d\d)\b/g;
-
-            const SECONDS_PER_YEAR = 365n * 24n * 60n * 60n;
-
-            function calculateCharacterPoolSize(password) {
-                let pool = 0;
-                let charTypes = 0;
-                if (/[a-z]/.test(password)) { pool += 26; charTypes++; }
-                if (/[A-Z]/.test(password)) { pool += 26; charTypes++; }
-                if (/[0-9]/.test(password)) { pool += 10; charTypes++; }
-                const symbols = password.replace(/[a-zA-Z0-9]/g, '');
-                const uniqueSymbols = new Set(symbols.split('')).size;
-                if (uniqueSymbols > 0) {
-                    pool += Math.min(33, uniqueSymbols * 2);
-                    charTypes++;
-                }
-                return { pool: Math.max(pool, 1), charTypes: charTypes };
-            }
-
-            function calculateBaseEntropy(password) {
-                if (!password) return 0;
-                const { pool } = calculateCharacterPoolSize(password);
-                return password.length * (Math.log(pool) / Math.log(2));
-            }
-
-            function getDictionaryPenalty(password) {
-                let penalty = 0;
-                const lowerPassword = password.toLowerCase();
-                for (const common of COMMON_PASSWORDS) {
-                    if (lowerPassword.includes(common.toLowerCase())) {
-                        penalty += Math.min(25, common.length * 1.5 + (password.length === common.length ? 5: 0) );
-                    }
-                }
-                let leetPassword = lowerPassword
-                    .replace(/0/g, 'o').replace(/3/g, 'e').replace(/@/g, 'a')
-                    .replace(/1/g, 'i').replace(/!/g, 'i').replace(/5/g, 's').replace(/\$/g, 's')
-                    .replace(/7/g, 't');
-                if (leetPassword !== lowerPassword) {
-                     for (const common of COMMON_PASSWORDS) {
-                        if (leetPassword.includes(common.toLowerCase())) {
-                            penalty += Math.min(20, common.length * 1.2);
-                        }
-                    }
-                }
-                return penalty;
-            }
-            
-            function getPatternPenalty(password) {
-                let penalty = 0;
-                const lowerPassword = password.toLowerCase();
-                let match;
-
-                const checkSequence = (regex, basePenalty, targetString) => {
-                    let tempPass = targetString;
-                    regex.lastIndex = 0; 
-                    while ((match = regex.exec(tempPass)) !== null) {
-                        penalty += Math.min(basePenalty, match[0].length * 1.5);
-                        tempPass = tempPass.substring(match.index + 1);
-                        regex.lastIndex = 0;
-                    }
-                };
-                checkSequence(REGEX_SEQUENCES_ALPHA, 10, lowerPassword);
-                checkSequence(REGEX_SEQUENCES_NUM, 8, lowerPassword);
-                
-                const reversedPassword = lowerPassword.split('').reverse().join('');
-                checkSequence(REGEX_SEQUENCES_ALPHA, 10, reversedPassword);
-                checkSequence(REGEX_SEQUENCES_NUM, 8, reversedPassword);
-
-                let tempPassRepeat3 = password;
-                REGEX_REPEATED_3PLUS.lastIndex = 0;
-                while ((match = REGEX_REPEATED_3PLUS.exec(tempPassRepeat3)) !== null) {
-                    penalty += Math.min(10, match[0].length * 2);
-                    tempPassRepeat3 = tempPassRepeat3.substring(match.index + 1);
-                    REGEX_REPEATED_3PLUS.lastIndex = 0;
-                }
-                
-                let tempPassRepeat2 = password;
-                REGEX_REPEATED_2PLUS.lastIndex = 0;
-                while ((match = REGEX_REPEATED_2PLUS.exec(tempPassRepeat2)) !== null) {
-                    if (match[0].length === 2) {
-                         penalty += Math.min(5, match[0].length * 1);
-                    }
-                    tempPassRepeat2 = tempPassRepeat2.substring(match.index + 1);
-                    REGEX_REPEATED_2PLUS.lastIndex = 0;
-                }
-
-                for (const pattern of KEYBOARD_PATTERNS.concat(SYMBOL_PATTERNS)) {
-                    if (lowerPassword.includes(pattern)) {
-                        penalty += Math.min(12, pattern.length * 1.2 + (lowerPassword.length === pattern.length ? 3:0));
-                    }
-                }
-                
-                REGEX_YEAR.lastIndex = 0;
-                if (REGEX_YEAR.test(password)) {
-                    penalty += 5;
-                }
-
-                return penalty;
-            }
-
-            function calculateEffectiveEntropy(password) {
-                if (!password) return 0;
-
-                const baseEntropy = calculateBaseEntropy(password);
-                let totalPenalty = 0;
-
-                if (password.length < 8) totalPenalty += 20;
-                else if (password.length < 10) totalPenalty += 10;
-                else if (password.length < 12) totalPenalty += 5;
-
-                const { charTypes } = calculateCharacterPoolSize(password);
-                if (charTypes === 1 && password.length > 1) totalPenalty += 10;
-                else if (charTypes === 2 && password.length > 3) totalPenalty += 5;
-
-                totalPenalty += getDictionaryPenalty(password);
-                totalPenalty += getPatternPenalty(password);
-                
-                if (/^[a-z]+$/.test(password) && password.length > 4) totalPenalty += 3;
-                if (/^[A-Z]+$/.test(password) && password.length > 4) totalPenalty += 3;
-                if (/^[0-9]+$/.test(password) && password.length > 4) totalPenalty += 3;
-
-                let effectiveEntropy = Math.max(0, baseEntropy - totalPenalty);
-                
-                if (password.length <= 3) {
-                    effectiveEntropy = Math.min(effectiveEntropy, password.length * 4);
-                } else if (password.length <=5) {
-                    effectiveEntropy = Math.min(effectiveEntropy, password.length * 5);
-                }
-                return effectiveEntropy;
-            }
-
-            function calculateAdvancedCrackTimeSeconds(entropy) {
-                if (entropy <= 0.1) return 0n;
-
-                const CLIPPING_SECONDS_VALUE = (999n * (10n ** 306n) * SECONDS_PER_YEAR) + 1n; 
-                                                                                          
-                if (entropy > 1090) { 
-                    return CLIPPING_SECONDS_VALUE;
-                }
-
-                let combinations;
-                try {
-                    const intEntropy = BigInt(Math.max(1, Math.round(entropy)));
-                    combinations = 2n ** intEntropy;
-                } catch (e) {
-                    return CLIPPING_SECONDS_VALUE;
-                }
-                
-                if (combinations === 0n && entropy > 0) return 0n;
-                const crackTime = combinations / ATTEMPTS_PER_SECOND_ADVANCED;
-                
-                if (crackTime >= CLIPPING_SECONDS_VALUE) {
-                    return CLIPPING_SECONDS_VALUE;
-                }
-                return crackTime < 0n ? 0n : crackTime;
-            }
-            
-            function getStrengthLevelFromEntropy(entropy) {
-                if (entropy < 28) return { text: '危険', step: 1 };
-                if (entropy < 36) return { text: '非常に弱い', step: 2 };
-                if (entropy < 60) return { text: '弱い', step: 3 };
-                if (entropy < 70) return { text: 'やや弱い', step: 4 };
-                if (entropy < 80) return { text: '普通', step: 5 };
-                if (entropy < 90) return { text: 'やや強い', step: 6 };
-                if (entropy < 100) return { text: '強い', step: 7 };
-                if (entropy < 110) return { text: '非常に強い', step: 8 };
-                if (entropy < 128) return { text: '極めて強い', step: 9 };
-                return { text: 'ほぼ解読不能', step: 10 };
-            }
 
             const englishNumericUnits = [
                 { power: 3,   name: 'thousand' }, { power: 6,   name: 'million' }, { power: 9,   name: 'billion' },
@@ -839,35 +651,24 @@
                 { power: 306, name: 'uncentillion' }
             ];
 
-            const UNCENTILLION_POWER = 306;
-            const MAX_DISPLAYABLE_UNCENTILLION_YEARS = 999n * (10n ** BigInt(UNCENTILLION_POWER));
-            const MAX_DISPLAYABLE_UNCENTILLION_SECONDS = MAX_DISPLAYABLE_UNCENTILLION_YEARS * SECONDS_PER_YEAR;
-
+            // --- 2. Helper Functions ---
 
             function formatBigNum(numYears) { 
                 if (numYears < 1000n) return numYears.toString();
-
                 let found = null;
                 const sortedUnits = [...englishNumericUnits].sort((a, b) => b.power - a.power);
                 for (let i = 0; i < sortedUnits.length; ++i) {
                     let unit = sortedUnits[i];
                     let p = unit.power;
                     let base = 10n ** BigInt(p);
-                    if (numYears >= base) {
-                        found = unit;
-                        break;
-                    }
+                    if (numYears >= base) { found = unit; break; }
                 }
-
                 if (!found) return numYears.toString();
-                
                 let divisor = 10n ** BigInt(found.power);
                 let quotient = numYears / divisor;
-
                 if (found.name === 'uncentillion' && numYears >= (10n ** BigInt(UNCENTILLION_POWER))) {
                      return `${quotient.toLocaleString('en')} uncentillion`;
                 }
-
                 let remainder = numYears % divisor;
                 let decimal = '';
                 let quotientStr = quotient.toString();
@@ -875,158 +676,412 @@
                 let showDecimals = 0;
                 if (integerPart < 10) showDecimals = 2;
                 else if (integerPart < 100) showDecimals = 1;
-                else showDecimals = 0;
-
                 if (showDecimals > 0 && remainder > 0n) {
                     let scale = 10n ** BigInt(showDecimals);
                     let fraction = (remainder * scale) / divisor;
                     if (fraction > 0n) {
                         let fractionStr = fraction.toString().padStart(showDecimals, '0');
                         let significantFraction = fractionStr.replace(/0+$/, '');
-                        if (significantFraction.length > 0) {
-                             decimal = '.' + significantFraction;
-                        }
+                        if (significantFraction.length > 0) decimal = '.' + significantFraction;
                     }
                 }
-                let qStr = quotient.toLocaleString('en');
-                return qStr + decimal + ' ' + found.name;
+                return quotient.toLocaleString('en') + decimal + ' ' + found.name;
             }
-            
-            function secondsToEnglishUnit(seconds, entropy = 0, attemptsPerSecond = 0n) {
-                if (seconds >= MAX_DISPLAYABLE_UNCENTILLION_SECONDS) {
-                    return 'uncentillion 年以上';
-                }
 
+            function secondsToEnglishUnit(seconds) {
+                if (seconds >= MAX_DISPLAYABLE_UNCENTILLION_SECONDS) return 'uncentillion 年以上';
                 if (seconds >= 1n) {
                     if (seconds < 60n) return (seconds > 1n ? seconds.toLocaleString('en') + ' 秒' : '1 秒');
                     if (seconds < 3600n) return (seconds / 60n).toLocaleString('en') + ' 分';
                     if (seconds < 86400n) return (seconds / 3600n).toLocaleString('en') + ' 時間';
                     if (seconds < SECONDS_PER_YEAR) return (seconds / 86400n).toLocaleString('en') + ' 日';
-                    
                     const years = seconds / SECONDS_PER_YEAR;
                     return formatBigNum(years) + ' 年';
                 }
-
-                if (entropy <= 0 || attemptsPerSecond === 0n) {
-                    return '瞬時';
-                }
-
-                const combinations = Math.pow(2, entropy);
-                const timeInSecondsFloat = combinations / Number(attemptsPerSecond);
-
-                if (timeInSecondsFloat <= 1e-9) { 
-                    return '瞬時';
-                }
-                if (timeInSecondsFloat < 1e-6) { 
-                    const ns = timeInSecondsFloat * 1e9;
-                    return `${parseFloat(ns.toPrecision(3))} ns`;
-                }
-                if (timeInSecondsFloat < 1e-3) { 
-                    const us = timeInSecondsFloat * 1e6;
-                    return `${parseFloat(us.toPrecision(3))} μs`;
-                }
-                if (timeInSecondsFloat < 1) { 
-                    const ms = timeInSecondsFloat * 1e3;
-                    return `${parseFloat(ms.toPrecision(3))} ms`;
-                }
-                
                 return '瞬時';
             }
 
-            function animateValueUpdate(element, newText, newColorClassSuffix) {
-                const textChanged = element.textContent !== newText;
-                const currentSuffix = element.className.match(/strength-step\d+/) ? element.className.match(/strength-step\d+/)[0] : '';
-                const classChanged = newColorClassSuffix !== currentSuffix;
-                element.textContent = newText;
-                if (newText === '-' || !newColorClassSuffix) {
-                    element.className = 'value';
+            function formatTimeLabel(val) {
+                if(val < 1) return (val * 1000).toFixed(0) + " ms";
+                if(val < 60) return val.toFixed(0) + " s";
+                if(val < 3600) return (val/60).toFixed(0) + " m";
+                if(val < 86400) return (val/3600).toFixed(0) + " h";
+                if(val < 31536000) return (val/86400).toFixed(0) + " d";
+                
+                try {
+                    const years = BigInt(Math.floor(val / 31536000));
+                    return formatBigNum(years) + " yr";
+                } catch(e) {
+                    return val.toExponential(1);
+                }
+            }
+
+            function setHighchartsTheme(isDark) {
+                const textColor = isDark ? '#e0e0e0' : '#333333';
+                const gridColor = isDark ? '#444444' : '#e6e6e6';
+                Highcharts.setOptions({
+                    chart: { backgroundColor: 'transparent' },
+                    title: { style: { color: textColor } },
+                    subtitle: { style: { color: textColor } },
+                    legend: { itemStyle: { color: textColor } },
+                    xAxis: { 
+                        labels: { style: { color: textColor } },
+                        lineColor: gridColor,
+                        tickColor: gridColor,
+                        title: { style: { color: textColor } }
+                    },
+                    yAxis: { 
+                        labels: { style: { color: textColor } },
+                        gridLineColor: gridColor,
+                        title: { style: { color: textColor } }
+                    },
+                    plotOptions: {
+                        series: { borderColor: isDark ? '#212529' : '#ffffff' },
+                        pie: { 
+                            dataLabels: { 
+                                style: { 
+                                    color: textColor, 
+                                    textOutline: isDark ? 'none' : '1px contrast' 
+                                } 
+                            } 
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: isDark ? 'rgba(33, 37, 41, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+                        style: { color: isDark ? '#f8f9fa' : '#333333' }
+                    }
+                });
+                
+                if(compositionChart) compositionChart.update({});
+                if(deviceTimeChart) deviceTimeChart.update({});
+                if(hashrateChart) hashrateChart.update({});
+                if(transitionChart) transitionChart.update({});
+            }
+
+            function calculateCharacterPoolSize(password) {
+                let pool = 0;
+                let charTypes = 0;
+                let counts = { lower: 0, upper: 0, number: 0, symbol: 0 };
+                const lowerMatch = password.match(/[a-z]/g);
+                if (lowerMatch) { pool += 26; charTypes++; counts.lower = lowerMatch.length; }
+                const upperMatch = password.match(/[A-Z]/g);
+                if (upperMatch) { pool += 26; charTypes++; counts.upper = upperMatch.length; }
+                const numberMatch = password.match(/[0-9]/g);
+                if (numberMatch) { pool += 10; charTypes++; counts.number = numberMatch.length; }
+                const symbols = password.replace(/[a-zA-Z0-9]/g, '');
+                if (symbols.length > 0) {
+                    const uniqueSymbols = new Set(symbols.split('')).size;
+                    pool += Math.min(33, uniqueSymbols * 2);
+                    charTypes++;
+                    counts.symbol = symbols.length;
+                }
+                return { pool: Math.max(pool, 1), charTypes: charTypes, counts: counts };
+            }
+
+            function calculateBaseEntropy(password) {
+                if (!password) return 0;
+                const { pool } = calculateCharacterPoolSize(password);
+                return password.length * (Math.log(pool) / Math.log(2));
+            }
+
+            function getDictionaryPenalty(password) {
+                let penalty = 0;
+                let foundPatterns = [];
+                const lowerPassword = password.toLowerCase();
+                for (const common of COMMON_PASSWORDS) {
+                    if (lowerPassword.includes(common.toLowerCase())) {
+                        penalty += Math.min(25, common.length * 1.5 + (password.length === common.length ? 5: 0) );
+                        if (!foundPatterns.includes(`一般的な単語: "${common}"`)) foundPatterns.push(`一般的な単語: "${common}"`);
+                    }
+                }
+                let leetPassword = lowerPassword.replace(/0/g, 'o').replace(/3/g, 'e').replace(/@/g, 'a')
+                    .replace(/1/g, 'i').replace(/!/g, 'i').replace(/5/g, 's').replace(/\$/g, 's').replace(/7/g, 't');
+                if (leetPassword !== lowerPassword) {
+                     for (const common of COMMON_PASSWORDS) {
+                        if (leetPassword.includes(common.toLowerCase())) {
+                            penalty += Math.min(20, common.length * 1.2);
+                            if (!foundPatterns.includes(`Leet変換単語: "${common}"`)) foundPatterns.push(`Leet変換単語: "${common}"`);
+                        }
+                    }
+                }
+                return { penalty, foundPatterns };
+            }
+            
+            function getPatternPenalty(password) {
+                let penalty = 0;
+                let foundPatterns = [];
+                const lowerPassword = password.toLowerCase();
+                let match;
+                const checkSequence = (regex, basePenalty, targetString, labelPrefix) => {
+                    let tempPass = targetString;
+                    regex.lastIndex = 0; 
+                    while ((match = regex.exec(tempPass)) !== null) {
+                        penalty += Math.min(basePenalty, match[0].length * 1.5);
+                        foundPatterns.push(`${labelPrefix}: "${match[0]}"`);
+                        tempPass = tempPass.substring(match.index + 1);
+                        regex.lastIndex = 0;
+                    }
+                };
+                checkSequence(REGEX_SEQUENCES_ALPHA, 10, lowerPassword, "アルファベット順");
+                checkSequence(REGEX_SEQUENCES_NUM, 8, lowerPassword, "数字順");
+                let tempPassRepeat3 = password;
+                REGEX_REPEATED_3PLUS.lastIndex = 0;
+                while ((match = REGEX_REPEATED_3PLUS.exec(tempPassRepeat3)) !== null) {
+                    penalty += Math.min(10, match[0].length * 2);
+                    foundPatterns.push(`連続する文字(3+): "${match[0]}"`);
+                    tempPassRepeat3 = tempPassRepeat3.substring(match.index + 1);
+                    REGEX_REPEATED_3PLUS.lastIndex = 0;
+                }
+                for (const pattern of KEYBOARD_PATTERNS.concat(SYMBOL_PATTERNS)) {
+                    if (lowerPassword.includes(pattern)) {
+                        penalty += Math.min(12, pattern.length * 1.2 + (lowerPassword.length === pattern.length ? 3:0));
+                        foundPatterns.push(`キーボード配列: "${pattern}"`);
+                    }
+                }
+                REGEX_YEAR.lastIndex = 0;
+                if (REGEX_YEAR.test(password)) {
+                    penalty += 5;
+                    foundPatterns.push("年号パターン");
+                }
+                return { penalty, foundPatterns };
+            }
+
+            function calculateEffectiveEntropy(password) {
+                if (!password) return { entropy: 0, patterns: [] };
+                const baseEntropy = calculateBaseEntropy(password);
+                let totalPenalty = 0;
+                let allPatterns = [];
+                if (password.length < 8) { totalPenalty += 20; allPatterns.push("短すぎる (8文字未満)"); }
+                else if (password.length < 10) totalPenalty += 10;
+                else if (password.length < 12) totalPenalty += 5;
+                const { charTypes } = calculateCharacterPoolSize(password);
+                if (charTypes === 1 && password.length > 1) { totalPenalty += 10; allPatterns.push("文字種が1種類のみ"); }
+                else if (charTypes === 2 && password.length > 3) { totalPenalty += 5; }
+                const dictResult = getDictionaryPenalty(password);
+                totalPenalty += dictResult.penalty;
+                allPatterns = allPatterns.concat(dictResult.foundPatterns);
+                const patternResult = getPatternPenalty(password);
+                totalPenalty += patternResult.penalty;
+                allPatterns = allPatterns.concat(patternResult.foundPatterns);
+                if (/^[a-z]+$/.test(password) && password.length > 4) totalPenalty += 3;
+                if (/^[A-Z]+$/.test(password) && password.length > 4) totalPenalty += 3;
+                if (/^[0-9]+$/.test(password) && password.length > 4) totalPenalty += 3;
+                let effectiveEntropy = Math.max(0, baseEntropy - totalPenalty);
+                if (password.length <= 3) {
+                    effectiveEntropy = Math.min(effectiveEntropy, password.length * 4);
+                } else if (password.length <=5) {
+                    effectiveEntropy = Math.min(effectiveEntropy, password.length * 5);
+                }
+                return { entropy: effectiveEntropy, patterns: [...new Set(allPatterns)] };
+            }
+
+            function calculateCrackTimeSeconds(entropy, speed) {
+                if (entropy <= 0.1) return 0n;
+                const CLIPPING_SECONDS_VALUE = (999n * (10n ** 306n) * SECONDS_PER_YEAR) + 1n; 
+                if (entropy > 1090) return CLIPPING_SECONDS_VALUE;
+                let combinations;
+                try {
+                    const intEntropy = BigInt(Math.max(1, Math.round(entropy)));
+                    combinations = 2n ** intEntropy;
+                } catch (e) { return CLIPPING_SECONDS_VALUE; }
+                if (combinations === 0n && entropy > 0) return 0n;
+                const crackTime = combinations / speed;
+                if (crackTime >= CLIPPING_SECONDS_VALUE) return CLIPPING_SECONDS_VALUE;
+                return crackTime < 0n ? 0n : crackTime;
+            }
+            
+            function getStrengthLevelFromEntropy(entropy) {
+                if (entropy < 28) return { text: '危険', step: 1, percent: 10 };
+                if (entropy < 36) return { text: '非常に弱い', step: 2, percent: 20 };
+                if (entropy < 60) return { text: '弱い', step: 3, percent: 30 };
+                if (entropy < 70) return { text: 'やや弱い', step: 4, percent: 40 };
+                if (entropy < 80) return { text: '普通', step: 5, percent: 50 };
+                if (entropy < 90) return { text: 'やや強い', step: 6, percent: 60 };
+                if (entropy < 100) return { text: '強い', step: 7, percent: 70 };
+                if (entropy < 110) return { text: '非常に強い', step: 8, percent: 80 };
+                if (entropy < 128) return { text: '極めて強い', step: 9, percent: 90 };
+                return { text: 'ほぼ解読不能', step: 10, percent: 100 };
+            }
+
+            // --- 3. UI Update Functions ---
+
+            function updatePatternList(patterns) {
+                const list = document.getElementById('patternList');
+                list.innerHTML = '';
+                if (patterns.length === 0) {
+                    list.innerHTML = '<span class="text-muted fst-italic small">パターンは検出されていません</span>';
+                    return;
+                }
+                patterns.forEach(p => {
+                    const span = document.createElement('span');
+                    span.className = 'detected-pattern bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded px-2 py-1 me-1 mb-1 d-inline-block small';
+                    span.textContent = p;
+                    list.appendChild(span);
+                });
+            }
+
+            function updateDeviceTimeList(effectiveEntropy) {
+                deviceTimeListElement.innerHTML = '';
+                DEVICES.forEach(device => {
+                    const sec = calculateCrackTimeSeconds(effectiveEntropy, device.speed);
+                    const timeStr = secondsToEnglishUnit(sec);
+                    
+                    const div = document.createElement('div');
+                    div.className = 'device-list-item';
+                    div.innerHTML = `
+                        <div class="device-header">
+                            <span class="device-name"><i class="bi bi-cpu me-1"></i>${device.name}</span>
+                            <span class="device-time">${timeStr}</span>
+                        </div>
+                        <div class="device-desc">${device.desc}</div>
+                    `;
+                    deviceTimeListElement.appendChild(div);
+                });
+            }
+
+            function updateCompositionChart(counts) {
+                const data = [
+                    { name: '大文字', y: counts.upper, color: '#0d6efd' },
+                    { name: '小文字', y: counts.lower, color: '#6610f2' },
+                    { name: '数字', y: counts.number, color: '#198754' },
+                    { name: '記号', y: counts.symbol, color: '#fd7e14' }
+                ].filter(d => d.y > 0);
+
+                if (!compositionChart) {
+                    compositionChart = Highcharts.chart('compositionChart', {
+                        chart: { type: 'pie', backgroundColor: 'transparent' },
+                        title: { text: null },
+                        credits: { enabled: false },
+                        tooltip: { pointFormat: '<b>{point.y} 文字</b>' },
+                        plotOptions: {
+                            pie: {
+                                innerSize: '60%',
+                                dataLabels: {
+                                    enabled: true,
+                                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                                    distance: 10,
+                                    style: { fontSize: '0.8rem' }
+                                }
+                            }
+                        },
+                        series: [{ name: '文字数', data: data }]
+                    });
                 } else {
-                    element.className = 'value ' + newColorClassSuffix;
-                }
-                if (textChanged || classChanged) {
-                    element.classList.remove('value-updated');
-                    void element.offsetWidth;
-                    element.classList.add('value-updated');
+                    compositionChart.series[0].setData(data);
                 }
             }
 
-            togglePassword.addEventListener('click', () => {
-                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordInput.setAttribute('type', type);
-                // When type is 'password', content is hidden, show 'eye' icon to reveal.
-                // When type is 'text', content is visible, show 'eye-slash' icon to hide.
-                togglePassword.innerHTML = (type === 'password') ? EYE_ICON_SVG : EYE_SLASH_ICON_SVG;
-            });
+            function updateDeviceTimeChart(entropy) {
+                const combinations = 2 ** entropy;
+                const seriesData = DEVICES.map(d => {
+                    let val = combinations / Number(d.speed);
+                    if(val < 1e-6) val = 1e-6; // Avoid log error
+                    return { y: val, color: d.color };
+                });
 
-            function setupPopup(button, popup) {
-                function closeAllOtherPopups(exceptThisPopup) {
-                    [timeInfoPopup, strengthInfoPopup, entropyInfoPopup, crackTimeTableInfoPopup].forEach(p => {
-                        if (p !== exceptThisPopup && p.classList.contains('visible')) {
-                            p.classList.remove('visible');
-                        }
+                if (!deviceTimeChart) {
+                    deviceTimeChart = Highcharts.chart('deviceTimeChart', {
+                        chart: { type: 'bar', backgroundColor: 'transparent' },
+                        title: { text: 'デバイス別推定解析時間', style: { fontSize: '14px' } },
+                        credits: { enabled: false },
+                        xAxis: { 
+                            categories: DEVICES.map(d => d.name),
+                            title: { text: null },
+                            labels: {
+                                style: { textOverflow: 'none' } 
+                            }
+                        },
+                        yAxis: { 
+                            type: 'logarithmic', 
+                            title: { text: 'Time' },
+                            labels: {
+                                formatter: function() { return formatTimeLabel(this.value); }
+                            }
+                        },
+                        tooltip: {
+                            formatter: function() {
+                                return `<b>${this.x}</b><br/>${formatTimeLabel(this.y)}`;
+                            }
+                        },
+                        legend: { enabled: false },
+                        series: [{ name: '解析時間', data: seriesData }]
+                    });
+                } else {
+                    deviceTimeChart.series[0].setData(seriesData);
+                }
+            }
+
+            function updateHashrateChart() {
+                const data = DEVICES.map(d => {
+                    let customLabel = '';
+                    if (d.speed >= 1_000_000_000_000_000_000n) customLabel = (d.speed/1_000_000_000_000_000_000n).toString() + ' EH/s';
+                    else if (d.speed >= 1_000_000_000_000_000n) customLabel = (d.speed/1_000_000_000_000_000n).toString() + ' PH/s';
+                    else if (d.speed >= 1_000_000_000_000n) customLabel = (d.speed/1_000_000_000_000n).toString() + ' TH/s';
+                    else if (d.speed >= 1_000_000_000n) customLabel = (d.speed/1_000_000_000n).toString() + ' GH/s';
+                    else if (d.speed >= 1_000_000n) customLabel = (d.speed/1_000_000n).toString() + ' MH/s';
+                    else customLabel = '0';
+
+                    return { 
+                        y: Number(d.speed), 
+                        color: d.color,
+                        customLabel: customLabel
+                    };
+                });
+                
+                if (!hashrateChart) {
+                    hashrateChart = Highcharts.chart('hashrateChart', {
+                        chart: { type: 'column', backgroundColor: 'transparent' },
+                        title: { text: 'デバイス別 Hash/s 性能比較', style: { fontSize: '14px' } },
+                        subtitle: { text: '2025年時点の推計値'},
+                        credits: { enabled: false },
+                        xAxis: { 
+                            categories: DEVICES.map(d => d.name),
+                            crosshair: true
+                        },
+                        yAxis: { 
+                            type: 'logarithmic', 
+                            title: { text: 'Hashes per Second' }
+                        },
+                        tooltip: { 
+                             formatter: function() {
+                                return `<b>${this.point.category}</b><br/>${this.point.customLabel}<br/>(${this.y.toExponential(2)} H/s)`;
+                            }
+                        },
+                        legend: { enabled: false },
+                        series: [{ name: 'Hash Rate', data: data }]
                     });
                 }
-                button.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const isCurrentlyVisible = popup.classList.contains('visible');
-                    closeAllOtherPopups(popup);
-                    if (!isCurrentlyVisible) {
-                        popup.classList.add('visible');
-                    } else {
-                        popup.classList.remove('visible');
-                    }
-                });
-                popup.addEventListener('click', (e) => {
-                    if (e.target === popup) { 
-                        popup.classList.remove('visible');
-                    }
-                });
             }
-            setupPopup(timeInfoBtn, timeInfoPopup);
-            setupPopup(strengthInfoBtn, strengthInfoPopup);
-            setupPopup(entropyInfoBtn, entropyInfoPopup);
-            setupPopup(crackTimeTableInfoBtn, crackTimeTableInfoPopup);
 
-            document.addEventListener('click', (e) => {
-                if (!e.target.closest('.info-icon') && !e.target.closest('.info-popup')) {
-                    [timeInfoPopup, strengthInfoPopup, entropyInfoPopup, crackTimeTableInfoPopup].forEach(p => {
-                        if (p.classList.contains('visible')) {
-                            p.classList.remove('visible');
-                        }
+            function updateTransitionChart(newEntropy) {
+                entropyHistory.push(newEntropy);
+                const seriesData = entropyHistory.map((val, idx) => ({ x: idx, y: val }));
+
+                if (!transitionChart) {
+                    transitionChart = Highcharts.chart('transitionChart', {
+                        chart: { type: 'spline', backgroundColor: 'transparent' },
+                        title: { text: 'エントロピーの推移', style: { fontSize: '14px' } },
+                        credits: { enabled: false },
+                        xAxis: { 
+                            title: { text: '入力ステップ' }, 
+                            allowDecimals: false
+                        },
+                        yAxis: { 
+                            title: { text: 'Entropy (bits)' },
+                            min: 0,
+                            plotLines: [{ value: 60, color: 'orange', dashStyle: 'shortdash', width: 2, label: { text: '弱い' } }, { value: 100, color: 'green', dashStyle: 'shortdash', width: 2, label: { text: '強い' } }]
+                        },
+                        series: [{ 
+                            name: 'Entropy', 
+                            data: seriesData,
+                            color: '#20c997',
+                            marker: { enabled: false }
+                        }]
                     });
+                } else {
+                    transitionChart.series[0].setData(seriesData);
                 }
-            });
-            [timeInfoPopup, strengthInfoPopup, entropyInfoPopup, crackTimeTableInfoPopup].forEach(popup => {
-                popup.addEventListener('click', e => {
-                    if (e.target !== popup) {
-                         e.stopPropagation();
-                    }
-                });
-            });
-
-
-            function setupTableToggle(button, tableContainerElement, allTableContainers) {
-                button.addEventListener('click', (e) => {
-                    if (e.target.closest('.info-icon')) {
-                        return;
-                    }
-                    const isCurrentlyVisible = tableContainerElement.classList.contains('visible');
-                    allTableContainers.forEach(tc => { tc.style.display = 'none'; tc.classList.remove('visible'); });
-                    if (!isCurrentlyVisible) {
-                        tableContainerElement.style.display = 'block';
-                        setTimeout(() => {
-                            tableContainerElement.classList.add('visible');
-                            tableContainerElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                        }, 10);
-                    }
-                });
             }
-            const allTableContainers = [crackTimeTableContainer, numericUnitsTableContainer, strengthLevelsTableContainer];
-            setupTableToggle(toggleCrackTimeTableBtn, crackTimeTableContainer, allTableContainers);
-            setupTableToggle(toggleNumericUnitsTableBtn, numericUnitsTableContainer, allTableContainers);
-            setupTableToggle(toggleStrengthLevelsTableBtn, strengthLevelsTableContainer, allTableContainers);
-
-            passwordInput.addEventListener('input', evaluatePassword);
 
             function evaluatePassword() {
                 const password = passwordInput.value;
@@ -1034,93 +1089,95 @@
                 let newCrackTimeText = '-';
                 let newPasswordStrengthText = '-';
                 let newEntropyValueText = '-'; 
-                let strengthColorClassSuffix = '';
-                let barWidthPercent = '0%';
+                let strengthColorClass = '';
+                let progressPercent = 0;
 
-                const setCriterionIcon = (element, isMet) => {
-                    element.classList.toggle('met', isMet);
-                    element.querySelector('.icon').innerHTML = isMet ? CHECK_ICON_SVG : X_ICON_SVG;
+                const setBadge = (element, isMet) => {
+                    if (isMet) {
+                        element.classList.add('met');
+                        element.querySelector('i').className = 'bi bi-check-circle-fill';
+                    } else {
+                        element.classList.remove('met');
+                        element.querySelector('i').className = 'bi bi-x-circle';
+                    }
                 };
 
                 if (length === 0) {
                     strengthBarIndicator.style.width = '0%';
                     strengthBarIndicator.className = 'strength-bar-indicator';
-                    [lengthCheck, uppercaseCheck, lowercaseCheck, numberCheck, symbolCheck].forEach(el => {
-                        el.classList.remove('met');
-                        el.querySelector('.icon').innerHTML = X_ICON_SVG;
-                    });
+                    strengthProgress.style.width = '0%';
+                    [lengthCheck, uppercaseCheck, lowercaseCheck, numberCheck, symbolCheck].forEach(el => setBadge(el, false));
+                    updatePatternList([]);
+                    updateDeviceTimeList(0);
+                    if(compositionChart) compositionChart.series[0].setData([]);
+                    if(deviceTimeChart) deviceTimeChart.series[0].setData([]);
+                    updateTransitionChart(0);
                 } else {
+                    const counts = calculateCharacterPoolSize(password).counts;
                     const hasUppercase = /[A-Z]/.test(password);
                     const hasLowercase = /[a-z]/.test(password);
                     const hasNumber = /[0-9]/.test(password);
                     const hasSymbol = /[^A-Za-z0-9]/.test(password);
 
-                    const effectiveEntropy = calculateEffectiveEntropy(password);
-                    const totalSeconds = calculateAdvancedCrackTimeSeconds(effectiveEntropy);
+                    const result = calculateEffectiveEntropy(password);
+                    const effectiveEntropy = result.entropy;
                     
-                    newCrackTimeText = secondsToEnglishUnit(totalSeconds, effectiveEntropy, ATTEMPTS_PER_SECOND_ADVANCED);
+                    const totalSeconds = calculateCrackTimeSeconds(effectiveEntropy, ATTEMPTS_PER_SECOND_MAIN);
+                    newCrackTimeText = secondsToEnglishUnit(totalSeconds);
                     
                     const strengthInfo = getStrengthLevelFromEntropy(effectiveEntropy);
                     newPasswordStrengthText = strengthInfo.text;
-                    strengthColorClassSuffix = 'strength-step' + strengthInfo.step;
-                    barWidthPercent = strengthInfo.step * 10 + '%';
+                    strengthColorClass = 'text-step' + strengthInfo.step;
+                    progressPercent = strengthInfo.percent;
 
                     newEntropyValueText = effectiveEntropy > 0 ? effectiveEntropy.toFixed(1) + ' bits' : (length > 0 ? '0.0 bits' : '-');
 
-                    strengthBarIndicator.style.width = barWidthPercent;
-                    strengthBarIndicator.className = 'strength-bar-indicator' + (strengthColorClassSuffix ? ' ' + strengthColorClassSuffix : '');
+                    strengthBarIndicator.style.width = progressPercent + '%';
+                    strengthBarIndicator.className = 'strength-bar-indicator color-step' + strengthInfo.step;
+                    
+                    strengthProgress.style.width = progressPercent + '%';
+                    strengthProgress.className = 'progress-bar color-step' + strengthInfo.step;
 
-                    setCriterionIcon(lengthCheck, length >= 8);
-                    setCriterionIcon(uppercaseCheck, hasUppercase);
-                    setCriterionIcon(lowercaseCheck, hasLowercase);
-                    setCriterionIcon(numberCheck, hasNumber);
-                    setCriterionIcon(symbolCheck, hasSymbol);
+                    setBadge(lengthCheck, length >= 8);
+                    setBadge(uppercaseCheck, hasUppercase);
+                    setBadge(lowercaseCheck, hasLowercase);
+                    setBadge(numberCheck, hasNumber);
+                    setBadge(symbolCheck, hasSymbol);
+
+                    updatePatternList(result.patterns);
+                    updateDeviceTimeList(effectiveEntropy);
+                    updateCompositionChart(counts);
+                    updateDeviceTimeChart(effectiveEntropy);
+                    updateTransitionChart(effectiveEntropy);
                 }
 
-                animateValueUpdate(crackTimeElement, newCrackTimeText, (newCrackTimeText === '-' ? '' : strengthColorClassSuffix));
-                animateValueUpdate(passwordStrengthElement, newPasswordStrengthText, (newPasswordStrengthText === '-' ? '' : strengthColorClassSuffix));
-                animateValueUpdate(entropyValueElement, newEntropyValueText, (newEntropyValueText === '-' ? '' : strengthColorClassSuffix)); 
+                crackTimeElement.textContent = newCrackTimeText;
+                passwordStrengthElement.textContent = newPasswordStrengthText;
+                passwordStrengthElement.className = 'result-value ' + strengthColorClass;
+                entropyValueElement.textContent = newEntropyValueText;
+                entropyValueElement.className = 'result-value ' + strengthColorClass;
             }
 
-            const ATTEMPTS_PER_SECOND_TABLE = 1_000_000_000n;
-             const charsetSizesForTable = {
-                num: 10n,
-                lower: 26n,
-                upperLower: 52n,
-                numUpperLower: 62n,
-                all: 95n
-            };
-            const TABLE_CLIPPING_SECONDS_VALUE = MAX_DISPLAYABLE_UNCENTILLION_SECONDS + 1n; 
-
+            // Table Generation Functions
             function calcCrackTimeSecondsForTable(charsetSize, length) {
-                if (length < 1) return 0n;
-                
-                const baseEntropy = length * (Math.log(Number(charsetSize)) / Math.log(2));
-                if (baseEntropy > 1070) { 
-                    return TABLE_CLIPPING_SECONDS_VALUE;
-                }
+                const ATTEMPTS_PER_SECOND_TABLE = 1_000_000_000n; // 10^9
+                const TABLE_CLIPPING_SECONDS_VALUE = MAX_DISPLAYABLE_UNCENTILLION_SECONDS + 1n; 
 
+                if (length < 1) return 0n;
+                const baseEntropy = length * (Math.log(Number(charsetSize)) / Math.log(2));
+                if (baseEntropy > 1070) return TABLE_CLIPPING_SECONDS_VALUE;
                 try {
                     let combinations = charsetSize ** BigInt(length);
                     let crackTime = combinations / ATTEMPTS_PER_SECOND_TABLE;
-                    if (crackTime >= TABLE_CLIPPING_SECONDS_VALUE) {
-                        return TABLE_CLIPPING_SECONDS_VALUE;
-                    }
+                    if (crackTime >= TABLE_CLIPPING_SECONDS_VALUE) return TABLE_CLIPPING_SECONDS_VALUE;
                     return crackTime;
-                } catch (e) {
-                    return TABLE_CLIPPING_SECONDS_VALUE; 
-                }
+                } catch (e) { return TABLE_CLIPPING_SECONDS_VALUE; }
             }
-            
-            function getColorClassForTimeForTable(seconds, entropy = 0, attemptsPerSecond = 0n) {
+
+            function getColorClassForTimeForTable(seconds) {
                 if (seconds >= MAX_DISPLAYABLE_UNCENTILLION_SECONDS) return 'color-step10';
-
                 if (seconds >= 1n) {
-                    const MINUTE = 60n;
-                    const HOUR = 60n * MINUTE;
-                    const DAY = 24n * HOUR;
-                    const YEAR = SECONDS_PER_YEAR;
-
+                    const MINUTE = 60n; const HOUR = 60n * MINUTE; const DAY = 24n * HOUR; const YEAR = SECONDS_PER_YEAR;
                     if (seconds < MINUTE) return 'color-step2';
                     if (seconds < HOUR * 3n) return 'color-step3';
                     if (seconds < DAY * 2n) return 'color-step4';
@@ -1131,89 +1188,117 @@
                     if (seconds < YEAR * (10n ** 12n)) return 'color-step9';
                     return 'color-step10';
                 }
-
-                if (entropy <= 0 || attemptsPerSecond === 0n) {
-                    return 'color-step1'; 
-                }
-
-                const combinations = Math.pow(2, entropy);
-                const timeInSecondsFloat = combinations / Number(attemptsPerSecond);
-
-                if (timeInSecondsFloat < 1e-3) { 
-                    return 'color-step1';
-                }
-                return 'color-step2';
+                return 'color-step1';
             }
 
-
             function generateCrackTimeTable() {
-                const mainTableBody = document.querySelector('#passwordStrengthTable tbody');
-                if (!mainTableBody) return;
-                mainTableBody.innerHTML = '';
+                const tbody = document.querySelector('#passwordStrengthTable tbody');
                 const categories = ['num', 'lower', 'upperLower', 'numUpperLower', 'all'];
+                const charsetSizesForTable = { num: 10n, lower: 26n, upperLower: 52n, numUpperLower: 62n, all: 95n };
+                const fragment = document.createDocumentFragment();
+                
                 for (let len = 4; len <= 323; ++len) { 
-                    const row = mainTableBody.insertRow();
-                    row.insertCell().textContent = len;
+                    const row = document.createElement('tr');
+                    
+                    const cellLen = document.createElement('td');
+                    cellLen.textContent = len;
+                    row.appendChild(cellLen);
+
                     categories.forEach(catKey => {
-                        const cell = row.insertCell();
+                        const cell = document.createElement('td');
                         const charsetSize = charsetSizesForTable[catKey];
-                        const entropy = len * (Math.log(Number(charsetSize)) / Math.log(2));
                         let sec = calcCrackTimeSecondsForTable(charsetSize, len);
-                        cell.textContent = secondsToEnglishUnit(sec, entropy, ATTEMPTS_PER_SECOND_TABLE);
-                        const colorClass = getColorClassForTimeForTable(sec, entropy, ATTEMPTS_PER_SECOND_TABLE);
-                        if (colorClass) cell.classList.add(colorClass);
+                        cell.textContent = secondsToEnglishUnit(sec);
+                        const colorClass = getColorClassForTimeForTable(sec);
+                        if (colorClass) cell.className = colorClass;
+                        row.appendChild(cell);
                     });
+                    fragment.appendChild(row);
                 }
+                tbody.appendChild(fragment);
             }
 
             function generateNumericUnitsTable() {
-                if (!numericUnitsTableBody) return;
-                numericUnitsTableBody.innerHTML = '';
+                const tbody = document.querySelector('#numericUnitsTable tbody');
                 const sortedUnits = [...englishNumericUnits].sort((a,b) => a.power - b.power);
                 sortedUnits.forEach(unit => {
-                    const row = numericUnitsTableBody.insertRow();
+                    const row = tbody.insertRow();
                     row.insertCell().textContent = unit.name;
                     row.insertCell().textContent = '10^' + unit.power;
                 });
             }
 
             function generateStrengthLevelsTable() {
-                if (!strengthLevelsTableBody) return;
-                strengthLevelsTableBody.innerHTML = '';
+                const tbody = document.querySelector('#strengthLevelsTable tbody');
                 const strengthSteps = [
-                    { level: '危険 (エントロピー <28 bit)', color: 'strength-step1' },
-                    { level: '非常に弱い (28-35 bit)', color: 'strength-step2' },
-                    { level: '弱い (36-59 bit)', color: 'strength-step3' },
-                    { level: 'やや弱い (60-69 bit)', color: 'strength-step4' },
-                    { level: '普通 (70-79 bit)', color: 'strength-step5' },
-                    { level: 'やや強い (80-89 bit)', color: 'strength-step6' },
-                    { level: '強い (90-99 bit)', color: 'strength-step7' },
-                    { level: '非常に強い (100-109 bit)', color: 'strength-step8' },
-                    { level: '極めて強い (110-127 bit)', color: 'strength-step9' },
-                    { level: 'ほぼ解読不能 (≧128 bit)', color: 'strength-step10' }
+                    { level: '危険 (エントロピー <28 bit)', color: 'color-step1' },
+                    { level: '非常に弱い (28-35 bit)', color: 'color-step2' },
+                    { level: '弱い (36-59 bit)', color: 'color-step3' },
+                    { level: 'やや弱い (60-69 bit)', color: 'color-step4' },
+                    { level: '普通 (70-79 bit)', color: 'color-step5' },
+                    { level: 'やや強い (80-89 bit)', color: 'color-step6' },
+                    { level: '強い (90-99 bit)', color: 'color-step7' },
+                    { level: '非常に強い (100-109 bit)', color: 'color-step8' },
+                    { level: '極めて強い (110-127 bit)', color: 'color-step9' },
+                    { level: 'ほぼ解読不能 (≧128 bit)', color: 'color-step10' }
                 ];
-                for (let i = 0; i < strengthSteps.length; ++i) {
-                    const row = strengthLevelsTableBody.insertRow();
-                    row.insertCell().textContent = strengthSteps[i].level;
+                strengthSteps.forEach(step => {
+                    const row = tbody.insertRow();
+                    row.insertCell().textContent = step.level;
                     const colorCell = row.insertCell();
-                    const colorSpan = document.createElement('span');
-                    colorSpan.className = `value ${strengthSteps[i].color}`;
-                    colorSpan.style.cssText = 'display: inline-block; width: 20px; height: 20px; border-radius: 3px; vertical-align: middle;';
-                    colorSpan.textContent = "\u00A0";
-                    colorCell.appendChild(colorSpan);
-                }
+                    const badge = document.createElement('span');
+                    badge.className = `badge rounded-pill ${step.color}`;
+                    badge.style.width = '60px';
+                    badge.innerHTML = '&nbsp;';
+                    colorCell.appendChild(badge);
+                });
             }
 
-            document.querySelectorAll('.fade-in-element').forEach((el, index) => {
-                if (!el.style.animationDelay) el.style.animationDelay = `${index * 0.05}s`;
-                if (!el.classList.contains('fade-in-element')) el.classList.add('fade-in-element');
-            });
+            // --- 4. Initialization ---
+
+            // Theme Detection & Setting
+            const getPreferredTheme = () => window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
             
+            const setTheme = (theme) => {
+                htmlElement.setAttribute('data-bs-theme', theme);
+                themeIcon.className = theme === 'light' ? 'bi bi-circle-half' : 'bi bi-moon-stars-fill';
+                setHighchartsTheme(theme === 'dark');
+            };
+
+            setTheme(getPreferredTheme());
+
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+                setTheme(event.matches ? 'dark' : 'light');
+            });
+
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = htmlElement.getAttribute('data-bs-theme');
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                setTheme(newTheme);
+            });
+
+            const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+            [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl, { html: true }));
+
+            togglePassword.addEventListener('click', () => {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                togglePassword.innerHTML = (type === 'password') ? '<i class="bi bi-eye-fill"></i>' : '<i class="bi bi-eye-slash-fill"></i>';
+            });
+
+            resetTransitionChartBtn.addEventListener('click', () => {
+                entropyHistory = [];
+                if(transitionChart) transitionChart.series[0].setData([]);
+            });
+
+            passwordInput.addEventListener('input', evaluatePassword);
+
+            // Execute
             generateCrackTimeTable();
             generateNumericUnitsTable();
             generateStrengthLevelsTable();
-
-            evaluatePassword(); 
+            updateHashrateChart();
+            evaluatePassword();
         });
     </script>
 </body>
