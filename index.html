@@ -1020,11 +1020,36 @@
             }
 
             function updateDeviceTimeChart(entropy) {
-                const combinations = 2 ** entropy;
+                // Number.MAX_VALUE は約1.79e308
+                // uncentillion年 (10^306年) は約3e313秒で、Numberでは扱えない
+                // グラフ上は1e308付近で天井にする
+                const GRAPH_MAX_VAL = 1.79e308;
+
                 const seriesData = DEVICES.map(d => {
-                    let val = combinations / Number(d.speed);
-                    if(val < 1e-6) val = 1e-6; // Avoid log error
-                    return { y: val, color: d.color };
+                    const secBig = calculateCrackTimeSeconds(entropy, d.speed);
+                    let yVal;
+                    let label;
+
+                    // 上限判定
+                    if (secBig >= MAX_DISPLAYABLE_UNCENTILLION_SECONDS) {
+                        yVal = GRAPH_MAX_VAL;
+                        label = "uncentillion 年以上";
+                    } else {
+                        let secNum = Number(secBig);
+                        if (!isFinite(secNum)) {
+                            yVal = GRAPH_MAX_VAL;
+                        } else {
+                            yVal = secNum;
+                        }
+                    }
+                    
+                    if (yVal < 1e-6) yVal = 1e-6;
+
+                    return { 
+                        y: yVal, 
+                        color: d.color,
+                        customLabel: label
+                    };
                 });
 
                 if (!deviceTimeChart) {
@@ -1044,11 +1069,13 @@
                             title: { text: 'Time' },
                             labels: {
                                 formatter: function() { return formatTimeLabel(this.value); }
-                            }
+                            },
+                            max: GRAPH_MAX_VAL // 天井を設定
                         },
                         tooltip: {
                             formatter: function() {
-                                return `<b>${this.point.category}</b><br/>${formatTimeLabel(this.y)}`;
+                                const timeStr = this.point.customLabel ? this.point.customLabel : formatTimeLabel(this.y);
+                                return `<b>${this.point.category}</b><br/>${timeStr}`;
                             }
                         },
                         legend: { enabled: false },
