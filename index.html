@@ -239,6 +239,30 @@
             z-index: 10;
         }
 
+        /* Logic View Styling */
+        .logic-code-block {
+            background-color: #f1f3f5;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            margin-bottom: 10px;
+            white-space: pre-wrap;
+        }
+        [data-bs-theme="dark"] .logic-code-block {
+            background-color: #2b3035;
+            border-color: #495057;
+            color: #e9ecef;
+        }
+        .logic-list-item {
+            margin-bottom: 8px;
+            padding-left: 10px;
+            border-left: 3px solid #6c757d;
+        }
+
         /* Color Utility Classes */
         .color-step1 { background-color: var(--color-step1) !important; color: white !important; }
         .color-step2 { background-color: var(--color-step2) !important; color: white !important; }
@@ -335,20 +359,27 @@
                             <div class="col-lg-6 text-center text-lg-start">
                                 <div class="result-label justify-content-center justify-content-lg-start mb-2">
                                     解析時間 (目安)
-                                    <button type="button" class="btn btn-link p-0 text-muted" data-bs-toggle="popover" data-bs-title="基準デバイスについて" data-bs-content="表示されているメインの時間は、<strong>解析リグ (RTX 5090 x8)</strong> を使用し、毎秒 <strong>約2,800億回 (280 GH/s)</strong> の総当たり攻撃を行った場合の推定時間です。<br>最新のマイニング専用機1台（約360 TH/s）の1000分の1以下の性能を基準としています。">
+                                    <!-- Button 1: 解析時間について -->
+                                    <button type="button" class="btn btn-link p-0 text-muted" data-bs-toggle="popover" data-bs-title="解析時間 (目安) とは" data-bs-content="このカードの時間は、辞書攻撃やキーボードパターン（qwerty等）、AIによる推測パターンを検知して計算されています。<br><strong>※『パターンを考慮』しています。</strong>ランダムでないパスワードは、下の表よりも大幅に早い時間がここに表示されます。">
                                         <i class="bi bi-info-circle-fill"></i>
                                     </button>
                                 </div>
                                 <div class="result-value display-4 my-2" id="crackTime">-</div>
-                                <div class="badge bg-primary-subtle text-primary border border-primary-subtle">
-                                    基準: 解析リグ (RTX 5090 x8) @ 280 GH/s
+                                <div class="d-flex align-items-center justify-content-center justify-content-lg-start gap-2">
+                                    <div class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                                        基準: 解析リグ (RTX 5090 x8) @ 280 GH/s
+                                    </div>
+                                    <!-- Button 2: 基準デバイスについて -->
+                                    <button type="button" class="btn btn-link p-0 text-muted" data-bs-toggle="popover" data-bs-title="基準デバイスの性能" data-bs-content="表示されているメインの時間は、<strong>解析リグ (RTX 5090 x8)</strong> を使用し、毎秒 <strong>約2,800億回 (280 GH/s)</strong> の試行を行った場合の推定時間です。<br>これは最新のマイニング専用機1台（約360 TH/s）の1000分の1以下の性能です。">
+                                        <i class="bi bi-info-circle-fill"></i>
+                                    </button>
                                 </div>
                             </div>
                             <div class="col-lg-6 mt-3 mt-lg-0">
                                 <div class="alert alert-secondary mb-0 small">
                                     <i class="bi bi-info-circle me-2"></i>
-                                    この時間は、攻撃者がハッシュ化されたパスワードを入手し、オフラインで総当たり攻撃（Brute-force）を行った場合の理論値です。
-                                    AIによる推測や辞書攻撃が成功した場合、この時間は大幅に短縮される可能性があります。
+                                    この時間は、攻撃者がパターン検知（辞書・AI推測）を併用した総当たり攻撃を行った場合の理論値です。
+                                    <strong>パターンが検出されると、解析時間は劇的に短縮されます。</strong>
                                 </div>
                             </div>
                         </div>
@@ -465,10 +496,12 @@
                         </h2>
                         <div id="collapseCrackTime" class="accordion-collapse collapse show" data-bs-parent="#dataTablesAccordion">
                             <div class="accordion-body">
-                                <p class="small text-muted">
-                                    <strong>注意:</strong> この表は、攻撃者が「使用された文字種」を完全に特定しており、かつパスワードが「完全にランダム」であると仮定した場合の理論値です。
-                                    攻撃速度は標準的な攻撃を想定した <strong>毎秒10億回 (10<sup>9</sup>)</strong> で計算されています。
-                                </p>
+                                <div class="alert alert-warning small">
+                                    <strong><i class="bi bi-exclamation-triangle-fill me-1"></i> 【重要】この表はパターンを考慮していません</strong><br>
+                                    この表は、パスワードが<strong>「完全にランダムな文字列」</strong>（例: <code>H9x#kL2$</code>）である場合の理論値です。<br>
+                                    「英単語」「名前」「誕生日」「キーボード配列」などを含むパスワードの解析時間は、この表よりも劇的に短くなります。<br>
+                                    <strong>パターンを考慮した実際の解析時間を確認したい場合は、ページ上部の『解析時間 (目安)』カードをご覧ください。</strong>
+                                </div>
                                 <div class="table-responsive">
                                     <table class="table table-sm table-bordered text-center" id="passwordStrengthTable">
                                         <thead class="table-light">
@@ -535,6 +568,24 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- New: Internal Logic Disclosure -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLogic">
+                                <i class="bi bi-code-square me-2"></i>【完全開示】評価アルゴリズム・内部辞書データ
+                            </button>
+                        </h2>
+                        <div id="collapseLogic" class="accordion-collapse collapse" data-bs-parent="#dataTablesAccordion">
+                            <div class="accordion-body">
+                                <p class="text-muted small">本ツールが使用している内部のペナルティ計算ロジックと、チェックに使用される辞書データの一覧です。隠し事はありません。</p>
+                                <div id="logicDetailsContent">
+                                    <!-- Populated by JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -606,7 +657,7 @@
                 },
                 { 
                     name: 'GPU (RTX 5090)', 
-                    speed: 35_000_000_000n, // ~35 GH/s
+                    speed: 35_000_000_000n, // ~35 GH/s (Based on SHA-256 estimates)
                     color: '#28a745',
                     desc: '単体GPUでは最強クラス。RTX 4090の約1.5倍〜2倍の性能が見込まれます。'
                 },
@@ -646,7 +697,8 @@
                 'love', 'sex', 'god', 'jesus', 'michael', 'john', 'david', 'robert', 'daniel', 'james',
                 'jennifer', 'linda', 'mary', 'susan', 'jessica', 'sarah', 'karen', 'lisa', 'ashley',
                 'company', 'service', 'support', 'network', 'online', 'website', 'manager', 'office',
-                'family', 'friend', 'home', 'school', 'hello', 'world', 'test1234', '1234test', 'qwerty1234'
+                'family', 'friend', 'home', 'school', 'hello', 'world', 'test1234', '1234test', 'qwerty1234',
+                'admin123', 'password123', 'japan', 'tokyo', 'coffee', 'baseball'
             ];
 
             const KEYBOARD_PATTERNS = [
@@ -1301,6 +1353,40 @@
                     colorCell.appendChild(badge);
                 });
             }
+            
+            // New: Generate Internal Logic Disclosure
+            function renderLogicDetails() {
+                const container = document.getElementById('logicDetailsContent');
+                
+                const html = `
+                    <h6 class="fw-bold mt-3">1. 基本エントロピー計算</h6>
+                    <div class="logic-code-block">BaseEntropy = Length * log2(CharacterPoolSize)</div>
+                    
+                    <h6 class="fw-bold mt-3">2. 減点（ペナルティ）ルール一覧</h6>
+                    <ul class="list-unstyled small">
+                        <li class="logic-list-item"><strong>文字数不足:</strong> 8文字未満=-20bit, 10文字未満=-10bit, 12文字未満=-5bit</li>
+                        <li class="logic-list-item"><strong>文字種の偏り:</strong> 1種類のみ=-10bit, 2種類かつ短文=-5bit</li>
+                        <li class="logic-list-item"><strong>辞書攻撃 (完全一致/部分一致):</strong> <code>Math.min(25, Length * 1.5 + Bonus)</code> の減点</li>
+                        <li class="logic-list-item"><strong>Leet変換 (a→@など):</strong> <code>Math.min(20, Length * 1.2)</code> の減点</li>
+                        <li class="logic-list-item"><strong>連番 (abc, 123):</strong> 英字=-10bitベース, 数字=-8bitベース</li>
+                        <li class="logic-list-item"><strong>繰り返し (aaa):</strong> -10bitベース</li>
+                        <li class="logic-list-item"><strong>キーボード配列 (qwerty):</strong> <code>Math.min(12, Length * 1.2)</code> の減点</li>
+                        <li class="logic-list-item"><strong>年号 (19xx, 20xx):</strong> -5bit</li>
+                        <li class="logic-list-item"><strong>単純な構造 (数字のみ/英字のみで4文字以上):</strong> -3bit (Entropy減少として処理)</li>
+                    </ul>
+
+                    <h6 class="fw-bold mt-3">3. 内部辞書データ (Common Passwords List)</h6>
+                    <div class="logic-code-block">${JSON.stringify(COMMON_PASSWORDS, null, 2)}</div>
+                    
+                    <h6 class="fw-bold mt-3">4. キーボードパターン (Keyboard Patterns)</h6>
+                    <div class="logic-code-block">${JSON.stringify(KEYBOARD_PATTERNS, null, 2)}</div>
+                    
+                    <h6 class="fw-bold mt-3">5. 記号パターン (Symbol Patterns)</h6>
+                    <div class="logic-code-block">${JSON.stringify(SYMBOL_PATTERNS, null, 2)}</div>
+                `;
+                
+                container.innerHTML = html;
+            }
 
             // --- 4. Initialization ---
 
@@ -1345,6 +1431,7 @@
             generateCrackTimeTable();
             generateNumericUnitsTable();
             generateStrengthLevelsTable();
+            renderLogicDetails(); // New Function Call
             updateHashrateChart();
             evaluatePassword();
         });
