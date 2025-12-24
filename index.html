@@ -140,43 +140,77 @@
             border-color: #0f5132;
         }
 
-        .device-list-item {
+        /* Device Grid System */
+        .device-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        @media (min-width: 768px) {
+            .device-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (min-width: 1200px) {
+            .device-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .device-card {
+            background-color: #f8f9fa;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 10px;
+            padding: 15px;
             display: flex;
             flex-direction: column;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            font-size: 0.9rem;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        [data-bs-theme="dark"] .device-list-item {
-            border-bottom-color: rgba(255,255,255,0.1);
+        [data-bs-theme="dark"] .device-card {
+            background-color: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.1);
         }
-        .device-list-item:last-child {
-            border-bottom: none;
+        .device-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
+
         .device-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding-bottom: 8px;
         }
+        [data-bs-theme="dark"] .device-header {
+            border-bottom-color: rgba(255,255,255,0.1);
+        }
+
         .device-name {
-            font-weight: 500;
-            color: #6c757d;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #495057;
         }
         [data-bs-theme="dark"] .device-name {
-            color: #adb5bd;
+            color: #e9ecef;
         }
         .device-time {
             font-weight: 700;
-            text-align: right;
+            font-size: 1.0rem;
+            color: #0d6efd;
+        }
+        [data-bs-theme="dark"] .device-time {
+            color: #6ea8fe;
         }
         .device-desc {
-            font-size: 0.75rem;
-            color: #999;
-            line-height: 1.3;
+            font-size: 0.8rem;
+            color: #6c757d;
+            line-height: 1.4;
         }
         [data-bs-theme="dark"] .device-desc {
-            color: #6c757d;
+            color: #adb5bd;
         }
 
         .popover { max-width: 400px; }
@@ -292,38 +326,47 @@
             </div>
         </div>
 
-        <!-- Main Metrics Row -->
-        <div class="row g-4 mb-5">
-            <!-- Crack Time & Device List -->
-            <div class="col-lg-4">
-                <div class="card h-100">
-                    <div class="card-body d-flex flex-col">
-                        <div class="mb-3">
-                            <div class="result-label">
-                                解析時間 (目安)
-                                <button type="button" class="btn btn-link p-0 text-muted" data-bs-toggle="popover" data-bs-title="基準デバイスについて" data-bs-content="表示されているメインの時間は、<strong>解析リグ (RTX 5090 x8)</strong> を使用し、毎秒 <strong>約2,800億回 (280 GH/s)</strong> の総当たり攻撃を行った場合の推定時間です。<br>最新のマイニング専用機1台（約360 TH/s）の1000分の1以下の性能を基準としています。">
-                                    <i class="bi bi-info-circle-fill"></i>
-                                </button>
+        <!-- Crack Time & Device List (Large Width) -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body p-4">
+                        <div class="row align-items-center mb-4 border-bottom pb-4">
+                            <div class="col-lg-6 text-center text-lg-start">
+                                <div class="result-label justify-content-center justify-content-lg-start mb-2">
+                                    解析時間 (目安)
+                                    <button type="button" class="btn btn-link p-0 text-muted" data-bs-toggle="popover" data-bs-title="基準デバイスについて" data-bs-content="表示されているメインの時間は、<strong>解析リグ (RTX 5090 x8)</strong> を使用し、毎秒 <strong>約2,800億回 (280 GH/s)</strong> の総当たり攻撃を行った場合の推定時間です。<br>最新のマイニング専用機1台（約360 TH/s）の1000分の1以下の性能を基準としています。">
+                                        <i class="bi bi-info-circle-fill"></i>
+                                    </button>
+                                </div>
+                                <div class="result-value display-4 my-2" id="crackTime">-</div>
+                                <div class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                                    基準: 解析リグ (RTX 5090 x8) @ 280 GH/s
+                                </div>
                             </div>
-                            <div class="result-value" id="crackTime">-</div>
-                            <div class="badge bg-primary-subtle text-primary border border-primary-subtle mb-3">
-                                基準: 解析リグ (RTX 5090 x8) @ 280 GH/s
+                            <div class="col-lg-6 mt-3 mt-lg-0">
+                                <div class="alert alert-secondary mb-0 small">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    この時間は、攻撃者がハッシュ化されたパスワードを入手し、オフラインで総当たり攻撃（Brute-force）を行った場合の理論値です。
+                                    AIによる推測や辞書攻撃が成功した場合、この時間は大幅に短縮される可能性があります。
+                                </div>
                             </div>
                         </div>
-                        
-                        <h6 class="border-bottom pb-2 mb-2 text-muted small text-uppercase fw-bold">各デバイスでの推定解析時間</h6>
-                        <div class="flex-grow-1 overflow-auto" style="max-height: 250px;">
-                            <div id="deviceTimeList">
-                                <!-- Generated by JS -->
-                            </div>
+
+                        <h5 class="fw-light mb-3"><i class="bi bi-speedometer me-2"></i>各デバイスでの推定解析時間</h5>
+                        <div id="deviceTimeList" class="device-grid">
+                            <!-- Generated by JS -->
                         </div>
                     </div>
                 </div>
             </div>
-            
+        </div>
+
+        <!-- Secondary Metrics Row -->
+        <div class="row g-4 mb-5">
             <!-- Strength Level -->
-            <div class="col-lg-4">
-                <div class="card result-card">
+            <div class="col-md-6">
+                <div class="card result-card h-100">
                     <div>
                         <div class="result-label">
                             強度レベル
@@ -332,7 +375,7 @@
                             </button>
                         </div>
                         <div class="result-value" id="passwordStrength">-</div>
-                        <div class="progress mt-3" style="height: 8px;">
+                        <div class="progress mt-3" style="height: 10px;">
                             <div class="progress-bar" id="strengthProgress" role="progressbar" style="width: 0%"></div>
                         </div>
                     </div>
@@ -347,19 +390,24 @@
             </div>
             
             <!-- Entropy & Composition -->
-            <div class="col-lg-4">
-                <div class="card result-card">
+            <div class="col-md-6">
+                <div class="card result-card h-100">
                     <div class="result-label">
                         エントロピー / 構成比
                         <button type="button" class="btn btn-link p-0 text-muted" data-bs-toggle="popover" data-bs-title="エントロピーとは？" data-bs-content="パスワードの「情報量」や「予測困難性」をビット(bit)単位で表したものです。数値が高いほどランダム性が高く、推測が困難であることを示します。<br>目安: 60bit以上で実用的、100bit以上で非常に強力。">
                             <i class="bi bi-info-circle-fill"></i>
                         </button>
                     </div>
-                    <div class="result-value" id="entropyValue">-</div>
-                    <div class="small text-muted mb-4">Effective Bits</div>
-
-                    <div style="height: 200px; position: relative;">
-                        <div id="compositionChart" style="height: 100%; width: 100%;"></div>
+                    <div class="row align-items-center h-100">
+                        <div class="col-sm-5">
+                            <div class="result-value mb-0" id="entropyValue">-</div>
+                            <div class="small text-muted">Effective Bits</div>
+                        </div>
+                        <div class="col-sm-7">
+                            <div style="height: 200px; position: relative;">
+                                <div id="compositionChart" style="height: 100%; width: 100%;"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -927,7 +975,7 @@
                     const timeStr = secondsToEnglishUnit(sec);
                     
                     const div = document.createElement('div');
-                    div.className = 'device-list-item';
+                    div.className = 'device-card';
                     div.innerHTML = `
                         <div class="device-header">
                             <span class="device-name"><i class="bi bi-cpu me-1"></i>${device.name}</span>
@@ -1000,7 +1048,7 @@
                         },
                         tooltip: {
                             formatter: function() {
-                                return `<b>${this.x}</b><br/>${formatTimeLabel(this.y)}`;
+                                return `<b>${this.point.category}</b><br/>${formatTimeLabel(this.y)}`;
                             }
                         },
                         legend: { enabled: false },
