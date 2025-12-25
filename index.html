@@ -262,6 +262,22 @@
             padding-left: 10px;
             border-left: 3px solid #6c757d;
         }
+        
+        .category-badge {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background-color: #e9ecef;
+            color: #495057;
+            margin-left: 10px;
+            font-weight: normal;
+            border: 1px solid #dee2e6;
+        }
+        [data-bs-theme="dark"] .category-badge {
+            background-color: #343a40;
+            color: #e9ecef;
+            border-color: #495057;
+        }
 
         /* Color Utility Classes */
         .color-step1 { background-color: var(--color-step1) !important; color: white !important; }
@@ -578,7 +594,8 @@
                         </h2>
                         <div id="collapseLogic" class="accordion-collapse collapse" data-bs-parent="#dataTablesAccordion">
                             <div class="accordion-body">
-                                <p class="text-muted small">本ツールが使用している内部のペナルティ計算ロジックと、チェックに使用される辞書データの一覧です。隠し事はありません。</p>
+                                <p class="text-muted small">本ツールが使用している内部のペナルティ計算ロジックと、チェックに使用される辞書データの一覧です。隠し事はありません。<br>
+                                    辞書データはカテゴリ別に分類されています。</p>
                                 <div id="logicDetailsContent">
                                     <!-- Populated by JS -->
                                 </div>
@@ -687,106 +704,196 @@
             const MAX_DISPLAYABLE_UNCENTILLION_YEARS = 999n * (10n ** BigInt(UNCENTILLION_POWER));
             const MAX_DISPLAYABLE_UNCENTILLION_SECONDS = MAX_DISPLAYABLE_UNCENTILLION_YEARS * SECONDS_PER_YEAR;
 
-            // Updated List based on 2024-2025 Global & Japan Leak Data
-            // Sources: NordPass Top 200 (2024), RockYou2024, Soliton Japan Ranking
-            const COMMON_PASSWORDS = [
-                // Top Global & Numeric Sequences
-                '123456', '123456789', '12345', '12345678', '111111', '1234567890', '1234567', 'password', '123123', '987654321',
-                '1234', '1111', '000000', '0000', '123123123', '123321', '654321', '12345678910', '112233', '121212',
-                '010101', '696969', '777777', '102030', '11111111', '123456789012', '12345678901', '135792468',
-                
-                // Top Words Global
-                'password', 'admin', 'pass', 'root', 'guest', 'user', 'login', 'welcome', 'master', 'secret',
-                'iloveyou', 'test', 'unknown', 'system', 'access', 'default', 'security', 'internet', 'computer',
-                'public', 'private', 'website', 'online', 'company', 'server', 'support', 'manager', 'service',
-                
-                // Japan Specific Top Leaked (Romaji Names, Anime, Culture)
-                'sakura', 'doraemon', 'baseball', 'hanshin', 'giants', 'dragon', 'takahiro', 'hiroshi', 'kazuya', 'masaki',
-                'tomoko', 'hiroko', 'kazuko', 'shinobu', 'yoshiko', 'mayumi', 'kazumi', 'naomi', 'yumi', 'akira',
-                'kenji', 'satomi', 'yoshio', 'takashi', 'keiko', 'junko', 'ryohei', 'yosuke', 'daisuke', 'naoki',
-                'takeshi', 'manabu', 'makoto', 'satoshi', 'toshi', 'katsumi', 'hideo', 'minoru', 'shigeru', 'kiyoshi',
-                'ichiro', 'jiro', 'saburo', 'shiro', 'goro', 'rokuro', 'hachiro', 'kurama', 'sasuke', 'naruto',
-                'luffy', 'zoro', 'sanji', 'nami', 'chopper', 'goku', 'vegeta', 'piccolo', 'gohan', 'trunks',
-                'pokemon', 'pikachu', 'eevee', 'charizard', 'mario', 'luigi', 'peach', 'bowser', 'zelda', 'link',
-                'sony', 'nintendo', 'sega', 'capcom', 'toyota', 'honda', 'nissan', 'suzuki', 'yamaha', 'kawasaki',
-                'tokyo', 'osaka', 'nagoya', 'sapporo', 'fukuoka', 'kyoto', 'kobe', 'yokohama', 'saitama', 'chiba',
-                'japan', 'nippon', 'nihon', 'samurai', 'ninja', 'geisha', 'sushi', 'tempura', 'ramen', 'anime',
-                'manga', 'otaku', 'kawaii', 'sensei', 'senpai', 'kouhai', 'arigato', 'sayonara', 'konnichiwa',
-                'nyanmage', 'kumamon', 'funassyi', 'ghibli', 'totoro', 'laputa', 'nausicaa', 'ponyo', 'chihiro',
-                
-                // English Common Names
-                'michael', 'david', 'james', 'john', 'robert', 'william', 'richard', 'thomas', 'daniel', 'matthew',
-                'anthony', 'donald', 'mark', 'paul', 'steven', 'andrew', 'kenneth', 'joshua', 'kevin', 'brian',
-                'george', 'edward', 'ronald', 'timothy', 'jason', 'jeffrey', 'ryan', 'jacob', 'gary', 'nicholas',
-                'jennifer', 'linda', 'susan', 'jessica', 'sarah', 'karen', 'nancy', 'lisa', 'betty', 'margaret',
-                'sandra', 'ashley', 'kimberly', 'emily', 'donna', 'michelle', 'dorothy', 'carol', 'amanda', 'melissa',
-                'deborah', 'stephanie', 'rebecca', 'sharon', 'laura', 'cynthia', 'kathleen', 'amy', 'shirley', 'angela',
-                'charlie', 'alex', 'max', 'sam', 'ben', 'dan', 'tom', 'harry', 'jack', 'joe',
-                
-                // Phrases & Slang (2024-2025)
-                'skibidi', 'sigma', 'rizz', 'gyatt', 'fanum', 'tax', 'ohio', 'bruh', 'cringe', 'based',
-                'whatever', 'forever', 'together', 'starwars', 'superman', 'batman', 'spiderman', 'ironman',
-                'avengers', 'marvel', 'disney', 'netflix', 'spotify', 'youtube', 'google', 'facebook', 'twitter',
-                'amazon', 'apple', 'microsoft', 'windows', 'linux', 'android', 'iphone', 'samsung', 'huawei',
-                'minecraft', 'roblox', 'fortnite', 'valorant', 'apex', 'league', 'dota', 'overwatch', 'callofduty',
-                'gta', 'rdr2', 'skyrim', 'fallout', 'cyberpunk', 'eldenring', 'darksouls', 'bloodborne', 'sekiro',
-                
-                // Keyboard Patterns (QWERTY / QWERTZ / AZERTY / JIS)
-                'qwerty', 'qwer', 'qwert', 'qwertyuiop', 'asdf', 'asdfgh', 'asdfghjkl', 'zxcv', 'zxcvbn', 'zxcvbnm',
-                'qazwsx', 'edcrfv', 'tgbyhn', 'ujmik', 'olp', 'poiuytrewq', 'lkjhgfdsa', 'mnbvcxz',
-                '1qaz', '2wsx', '3edc', '4rfv', '5tgb', '6yhn', '7ujm', '8ik', '9ol', '0p',
-                'qazwsxedc', 'wsxedcrfv', 'edcrfvtgb', 'rfvtgbyhn', 'tgbyhnujm', 'yhnujmik', 'ujmikolp',
-                'zaq1', 'xsw2', 'cde3', 'vfr4', 'bgt5', 'nhy6', 'mju7', 'mki8', 'lo9', 'p0',
-                'qwe', 'wer', 'ert', 'rty', 'tyu', 'yui', 'uio', 'iop',
-                'asd', 'sdf', 'dfg', 'fgh', 'ghj', 'hjk', 'jkl',
-                'zxc', 'xcv', 'cvb', 'vbn', 'bnm',
-                'azerty', 'ytreza', 'qsdfgh', 'hgfdsq', 'wxcvbn', 'nbvcxw', // AZERTY specific
-                'qwertz', 'ztrewq', // QWERTZ specific
-                
-                // Misc Common
-                'letmein', 'trustno1', 'changeme', 'fuckyou', 'asshole', 'bitch', 'shit', // Profanity is common
-                'freedom', 'jesus', 'christ', 'god', 'heaven', 'angel', 'demon', 'hell', 'satan',
-                'lucifer', 'devil', 'money', 'dollar', 'cash', 'rich', 'poor', 'success', 'boss',
-                'king', 'queen', 'prince', 'princess', 'royal', 'crown', 'castle', 'palace', 'kingdom',
-                'sun', 'moon', 'star', 'sky', 'cloud', 'rain', 'snow', 'wind', 'fire', 'water',
-                'earth', 'world', 'universe', 'galaxy', 'planet', 'mars', 'jupiter', 'saturn', 'venus',
-                'red', 'blue', 'green', 'yellow', 'orange', 'purple', 'black', 'white', 'pink', 'gold',
-                'silver', 'bronze', 'metal', 'steel', 'iron', 'stone', 'rock', 'paper', 'scissor',
-                'dog', 'cat', 'bird', 'fish', 'horse', 'cow', 'pig', 'sheep', 'chicken', 'duck',
-                'lion', 'tiger', 'bear', 'wolf', 'fox', 'monkey', 'panda', 'koala', 'eagle', 'hawk',
-                'rose', 'lily', 'tulip', 'lotus', 'jasmine', 'daisy', 'sunflower', 'violet', 'orchid',
-                'apple', 'banana', 'orange', 'grape', 'melon', 'peach', 'lemon', 'lime', 'berry',
-                'coffee', 'tea', 'milk', 'water', 'juice', 'soda', 'coke', 'pepsi', 'beer', 'wine',
-                'pizza', 'burger', 'pasta', 'sushi', 'rice', 'bread', 'cake', 'cookie', 'candy',
-                'love', 'hate', 'life', 'death', 'live', 'die', 'born', 'kill', 'peace', 'war',
-                'happy', 'sad', 'angry', 'smile', 'cry', 'laugh', 'dream', 'hope', 'wish', 'believe',
-                
-                // Brands & Tech (More)
-                'adobe', 'photoshop', 'office', 'excel', 'word', 'powerpoint', 'outlook', 'teams', 'zoom',
-                'slack', 'discord', 'skype', 'whatsapp', 'telegram', 'signal', 'line', 'wechat', 'viber',
-                'instagram', 'tiktok', 'snapchat', 'pinterest', 'linkedin', 'reddit', 'tumblr', 'flickr',
-                'dropbox', 'icloud', 'drive', 'onedrive', 'box', 'mega', 'mediafire', 'rapidshare',
-                'cisco', 'intel', 'amd', 'nvidia', 'asus', 'acer', 'dell', 'hp', 'lenovo', 'msi',
-                'canon', 'nikon', 'epson', 'brother', 'panasonic', 'sharp', 'toshiba', 'hitachi', 'nec',
-                'fujitsu', 'mitsubishi', 'sumitomo', 'softbank', 'au', 'docomo', 'rakuten', 'yahoo',
-                
-                // "Top 200" styled combinations
-                'password123', 'admin123', 'secret123', 'welcome123', 'login123', 'user123', 'guest123',
-                'password1234', 'admin1234', 'secret1234', 'welcome1234', 'login1234', 'user1234',
-                'password!', 'admin!', 'secret!', 'welcome!', 'login!', 'user!', 'guest!',
-                'password@', 'admin@', 'secret@', 'welcome@', 'login@', 'user@', 'guest@',
-                'p@ssword', 'p@ssw0rd', 'P@ssword', 'P@ssw0rd', 'Pa$$word', 'admin@123', 'Password123'
-            ];
+            // Massive Dictionary Expansion - Structured by Category
+            // This structure allows for both powerful analysis and transparent disclosure on the frontend.
+            const DICTIONARY_CATEGORIES = {
+                "1. Numeric & Simple Sequences": [
+                    '123456', '123456789', '12345', '12345678', '111111', '1234567890', '1234567', '123123', '987654321',
+                    '1234', '1111', '000000', '0000', '123123123', '123321', '654321', '12345678910', '112233', '121212',
+                    '010101', '696969', '777777', '102030', '11111111', '123456789012', '12345678901', '135792468',
+                    '888888', '999999', '555555', '222222', '333333', '444444', '123123123123', '159753', '741852963'
+                ],
+                "2. Common English Words (Global Leaks)": [
+                    'password', 'admin', 'pass', 'root', 'guest', 'user', 'login', 'welcome', 'master', 'secret',
+                    'iloveyou', 'test', 'unknown', 'system', 'access', 'default', 'security', 'internet', 'computer',
+                    'public', 'private', 'website', 'online', 'company', 'server', 'support', 'manager', 'service',
+                    'dragon', 'monkey', 'football', 'baseball', 'princess', 'shadow', 'sunshine', 'freedom', 'trustno1',
+                    'letmein', 'changeme', 'fuckyou', 'asshole', 'bitch', 'shit', 'whatever', 'forever', 'together',
+                    'angel', 'demon', 'devil', 'heaven', 'hell', 'jesus', 'god', 'christ', 'faith', 'hope', 'love',
+                    'money', 'dollar', 'cash', 'rich', 'poor', 'success', 'winner', 'loser', 'king', 'queen', 'prince',
+                    'star', 'moon', 'sun', 'sky', 'cloud', 'rain', 'snow', 'wind', 'fire', 'water', 'earth', 'world',
+                    'red', 'blue', 'green', 'yellow', 'orange', 'purple', 'black', 'white', 'pink', 'gold', 'silver',
+                    'dog', 'cat', 'fish', 'bird', 'horse', 'lion', 'tiger', 'bear', 'wolf', 'eagle', 'shark', 'whale',
+                    'coffee', 'tea', 'milk', 'beer', 'wine', 'pizza', 'burger', 'chocolate', 'cookie', 'cake', 'sweet'
+                ],
+                "3. Italian Brainrot & Maranza 2024-2025": [
+                    'tralalero', 'tralala', 'tralalelo', 'ballerina', 'cappuccina', 'cappuccino', 'assassino', 'bombardino',
+                    'crocodilo', 'tungtung', 'sahur', 'lirilarila', 'chimpanzini', 'bananini', 'bombombini', 'gusini',
+                    'bobrito', 'bandito', 'trippatroppa', 'karkerkur', 'patapim', 'slim', 'ornella', 'leccacappella',
+                    'professor', 'professore', 'pizzaboy', 'maranza', 'zanza', 'tuta', 'tech', 'niketech', 'borseggio',
+                    'scialla', 'sbroccare', 'sbocciare', 'sbatti', 'amo', 'amio', 'chara', 'biscottino', 'ingiocabile',
+                    'fresca', 'zone', 'piazza', 'bro', 'fra', 'zio', 'vecchio', 'boh', 'figo', 'fresco', 'godo', 'pazzo',
+                    'sgravato', 'droga', 'zombie', 'fentanyl', 'propal', 'ciao', 'amore', 'mamma', 'papa', 'nonno', 'nonna',
+                    'calcio', 'juventus', 'milan', 'inter', 'napoli', 'roma', 'ferrari', 'lamborghini', 'fiat', 'pasta',
+                    'lasagna', 'tiramisu', 'gelato', 'italia', 'bella', 'notte'
+                ],
+                "4. Japanese Top Leaks (Names, Places, Culture)": [
+                    'sato', 'suzuki', 'takahashi', 'tanaka', 'watanabe', 'ito', 'yamamoto', '中村', 'nakamura', 'kobayashi',
+                    'kato', 'yoshida', 'yamada', 'sasaki', 'yamaguchi', 'saito', 'matsumoto', 'inoue', 'kimura', 'hayashi',
+                    'shimizu', 'yamazaki', 'mori', 'abe', 'ikeda', 'hashimoto', 'yamashita', 'ishikawa', 'nakajima', 'maeda',
+                    'fujita', 'ogawa', 'goto', 'okada', 'hasegawa', 'murakami', 'kondo', 'ishii', 'sakamoto', 'endo',
+                    'sakura', 'hiroshi', 'takahiro', 'kazuya', 'masaki', 'daisuke', 'naoki', 'takeshi', 'manabu', 'makoto',
+                    'satoshi', 'toshi', 'katsumi', 'hideo', 'minoru', 'shigeru', 'kiyoshi', 'ichiro', 'jiro', 'saburo',
+                    'kenji', 'yoshio', 'takashi', 'ryohei', 'yosuke', 'akira', 'shouhei', 'shohei', 'kenta', 'shota',
+                    'haruto', 'yuto', 'souta', 'minato', 'ren', 'ikuya', 'itsuki', 'yamato', 'riku', 'kaito', 'asahi',
+                    'hana', 'himari', 'akari', 'yui', 'rio', 'mei', 'mio', 'ichika', 'ema', 'tsumugi', 'koharu', 'cocomi',
+                    'tomoko', 'hiroko', 'kazuko', 'shinobu', 'yoshiko', 'mayumi', 'kazumi', 'naomi', 'yumi', 'satomi',
+                    'keiko', 'junko', 'noriko', 'akiko', 'yuko', 'masako', 'yukiko', 'mariko', 'reiko', 'kyoko',
+                    'tokyo', 'osaka', 'nagoya', 'sapporo', 'fukuoka', 'kyoto', 'kobe', 'yokohama', 'saitama', 'chiba',
+                    'hiroshima', 'sendai', 'okinawa', 'hokkaido', 'shinjuku', 'shibuya', 'harajuku', 'ginza', 'akiba', 'akihabara',
+                    'japan', 'nippon', 'nihon', 'roppongi', 'ikebukuro', 'ueno', 'asakusa', 'kamakura', 'hakone', 'fuji',
+                    'samurai', 'ninja', 'geisha', 'sushi', 'tempura', 'ramen', 'udon', 'soba', 'matcha', 'wasabi',
+                    'kawaii', 'anime', 'manga', 'otaku', 'hentai', 'sensei', 'senpai', 'kouhai', 'kohai', 'dohai',
+                    'arigato', 'sayonara', 'konnichiwa', 'ohayo', 'kombanwa', 'baka', 'aho', 'yamete', 'kimochi',
+                    'katana', 'kimono', 'yukata', 'haiku', 'kanji', 'hiragana', 'katakana', 'zazen', 'sumo', 'judu',
+                    'karate', 'aikido', 'kendo', 'bushido', 'shogun', 'daimyo', 'emperor', 'mikado', 'bonsai', 'origami',
+                    'sakura', 'momo', 'ume', 'kiku', 'tsubaki', 'ajisai', 'himawari', 'asagao', 'momiji', 'yuki'
+                ],
+                "5. Anime / Manga / Game Characters": [
+                    'doraemon', 'nobita', 'shizuka', 'gian', 'suneo', 'dorami',
+                    'goku', 'vegeta', 'gohan', 'trunks', 'piccolo', 'frieza', 'cell', 'buu', 'kamehameha', 'saiyan',
+                    'luffy', 'zoro', 'sanji', 'nami', 'usopp', 'chopper', 'robin', 'franky', 'brook', 'jimbei', 'onepiece',
+                    'naruto', 'sasuke', 'sakura', 'kakashi', 'itachi', 'gaara', 'hinata', 'boruto', 'hokage', 'sharingan',
+                    'tanjiro', 'nezuko', 'zenitsu', 'inosuke', 'giyu', 'shinobu', 'rengoku', 'muzan', 'kimetsu', 'demonslayer',
+                    'gojo', 'satoru', 'itadori', 'yuji', 'fushiguro', 'megumi', 'kugisaki', 'nobara', 'sukuna', 'jujutsu',
+                    'anya', 'loid', 'yor', 'bond', 'spyxfamily', 'forger',
+                    'denji', 'makima', 'power', 'aki', 'chainsaw', 'pochita',
+                    'frieren', 'fern', 'stark', 'himmel', 'heiter', 'eisen', 'sousou',
+                    'oshi', 'hoshino', 'ai', 'ruby', 'aqua', 'kana', 'akane', 'memcho', 'oshinoko',
+                    'kafka', 'hibino', 'kikoru', 'shinomiya', 'kaiju', 'no8',
+                    'rimuru', 'tempest', 'slime', 'veldora', 'shion', 'benimaru',
+                    'subaru', 'emilia', 'rem', 'ram', 'rezero', 'beatrice',
+                    'kirito', 'asuna', 'sao', 'swordart', 'online', 'yui',
+                    'pikachu', 'eevee', 'charizard', 'mewtwo', 'lucario', 'pokemon', 'satoshi', 'ash', 'misty', 'brock',
+                    'mario', 'luigi', 'peach', 'toad', 'bowser', 'yoshi', 'wario', 'waluigi', 'donkeykong',
+                    'link', 'zelda', 'ganon', 'ganondorf', 'hyrule', 'triforce', 'epona', 'sheik',
+                    'cloud', 'tifa', 'aerith', 'sephiroth', 'barret', 'yuffie', 'redxiii', 'cid', 'finalfantasy',
+                    'snake', 'raiden', 'bigboss', 'otacon', 'metalgear', 'solid',
+                    'kirby', 'dedede', 'metaknight', 'waddledee',
+                    'sonic', 'tails', 'knuckles', 'shadow', 'eggman', 'amy',
+                    'sans', 'papyrus', 'toriel', 'frisk', 'chara', 'undertale', 'megalovania',
+                    'steve', 'alex', 'creeper', 'enderman', 'zombie', 'skeleton', 'minecraft', 'notch', 'herobrine',
+                    'roblox', 'noob', 'guest', 'admin', 'builder', 'bloxcity'
+                ],
+                "6. Brands / Companies / Tech": [
+                    'toyota', 'honda', 'nissan', 'suzuki', 'mazda', 'subaru', 'mitsubishi', 'lexus', 'daihatsu',
+                    'sony', 'panasonic', 'toshiba', 'sharp', 'hitachi', 'fujitsu', 'nec', 'canon', 'nikon', 'olympus',
+                    'nintendo', 'sega', 'capcom', 'konami', 'namco', 'bandai', 'square', 'enix', 'atlus',
+                    'google', 'apple', 'microsoft', 'amazon', 'facebook', 'meta', 'twitter', 'x', 'instagram', 'tiktok',
+                    'youtube', 'netflix', 'spotify', 'twitch', 'discord', 'slack', 'zoom', 'teams', 'adobe',
+                    'windows', 'linux', 'macos', 'android', 'ios', 'iphone', 'ipad', 'macbook', 'samsung', 'galaxy',
+                    'huawei', 'xiaomi', 'oppo', 'vivo', 'oneplus', 'pixel', 'xperia', 'aquos', 'arrows',
+                    'softbank', 'docomo', 'au', 'rakuten', 'yahoo', 'line', 'paypay', 'mercari', 'zozo',
+                    'uniqlo', 'gu', 'muji', 'shimamura', 'nitori', 'aeon', 'seven', 'lawson', 'famima'
+                ],
+                "7. Sports (Teams, Players, Terms)": [
+                    'baseball', 'soccer', 'football', 'basketball', 'tennis', 'golf', 'rugby', 'volleyball',
+                    'giants', 'tigers', 'dragons', 'baystars', 'carp', 'swallows', 'hawks', 'fighters', 'marines', 'lions', 'eagles', 'buffaloes',
+                    'hanshin', 'yomiuri', 'chunichi', 'yokohama', 'hiroshima', 'yakult', 'softbank', 'nipponham', 'lotte', 'seibu', 'rakuten', 'orix',
+                    'realmadrid', 'barcelona', 'manchester', 'liverpool', 'chelsea', 'arsenal', 'juventus', 'milan', 'bayern', 'psg',
+                    'lakers', 'warriors', 'bulls', 'celtics', 'heat', 'knicks', 'nets', 'rockets', 'spurs', 'suns',
+                    'ohtani', 'shohei', 'darvish', 'ichiro', 'matsui', 'judge', 'trout', 'betts', 'freeman', 'yamamoto',
+                    'messi', 'ronaldo', 'neymar', 'mbappe', 'haaland', 'lewandowski', 'salah', 'debruyne', 'kane',
+                    'lebron', 'curry', 'durant', 'giannis', 'jokic', 'luka', 'tatum', 'butler', 'embiid',
+                    'jordan', 'kobe', 'shaq', 'magic', 'bird', 'ippon', 'waza'
+                ],
+                "8. 2024-2025 Trends & Slang": [
+                    'skibidi', 'toilet', 'sigma', 'rizz', 'gyatt', 'fanum', 'tax', 'ohio', 'grimace', 'shake',
+                    'kai', 'cenat', 'ishowspeed', 'speed', 'ksi', 'logan', 'paul', 'prime', 'mrbeast', 'beast',
+                    'based', 'cringe', 'boomer', 'zoomer', 'doomer', 'gloomer', 'trad', 'woke', 'cancel',
+                    'slay', 'period', 'queen', 'king', 'bussin', 'sheesh', 'cap', 'nocap', 'bet', 'fr', 'ong',
+                    'mid', 'sus', 'imposter', 'vent', 'amogus', 'amongus', 'baka', 'sussy',
+                    'gpt', 'chatgpt', 'openai', 'gemini', 'bard', 'claude', 'llama', 'copilot', 'ai', 'artificial',
+                    'crypto', 'bitcoin', 'btc', 'ethereum', 'eth', 'doge', 'shiba', 'nft', 'blockchain', 'wallet',
+                    'metaverse', 'web3', 'dao', 'defi', 'fud', 'hodl', 'moon', 'lambo', 'wagmi',
+                    'swiftie', 'taylor', 'swift', 'eras', 'travis', 'kelce', 'chiefs', 'superbowl',
+                    'barbie', 'oppenheimer', 'barbenheimer', 'ken', 'allan', 'mojo', 'dojo', 'casa', 'house',
+                    'kuebiko', 'shogun', 'blackthorne', 'mariko', 'toranaga',
+                    'gta6', 'gta', 'rockstar', 'vice', 'city', 'lucia', 'jason',
+                    'elden', 'ring', 'shadow', 'erdtree', 'messmer', 'miquella', 'malenia', 'radahn',
+                    'palworld', 'pal', 'pals', 'pocket', 'pair',
+                    'goon', 'mewing', 'looksmax', 'mog', 'mogging', 'bop', 'pookie'
+                ],
+                "9. Music (K-Pop, J-Pop, Global)": [
+                    'bts', 'army', 'jungkook', 'v', 'jimin', 'suga', 'jin', 'rm', 'jhope',
+                    'blackpink', 'blink', 'lisa', 'jennie', 'jisoo', 'rose',
+                    'twice', 'once', 'newjeans', 'bunnies', 'ive', 'lesserafim', 'aespa', 'straykids', 'seventeen',
+                    'yoasobi', 'idol', 'yoru', 'kakeru', 'ikura', 'ayase',
+                    'ado', 'uta', 'unravel', 'show', 'ready',
+                    'kenshi', 'yonezu', 'lemon', 'kickback', 'lady',
+                    'kinggnu', 'millennium', 'parade', 'hakujitsu',
+                    'official', 'hige', 'dandism', 'pretender', 'mixed', 'nuts',
+                    'vaundy', 'odoriko', 'kaiju', 'hana', 'uranai',
+                    'fujii', 'kaze', 'kirari', 'matsuri', 'shinunoga'
+                ],
+                "10. Common English Names": [
+                    'michael', 'david', 'james', 'john', 'robert', 'william', 'richard', 'thomas', 'daniel', 'matthew',
+                    'anthony', 'donald', 'mark', 'paul', 'steven', 'andrew', 'kenneth', 'joshua', 'kevin', 'brian',
+                    'george', 'edward', 'ronald', 'timothy', 'jason', 'jeffrey', 'ryan', 'jacob', 'gary', 'nicholas',
+                    'eric', 'stephen', 'jonathan', 'larry', 'justin', 'scott', 'brandon', 'benjamin', 'samuel', 'gregory',
+                    'frank', 'alexander', 'raymond', 'patrick', 'jack', 'dennis', 'jerry', 'tyler', 'aaron', 'jose',
+                    'adam', 'henry', 'nathan', 'douglas', 'zachary', 'peter', 'kyle', 'walter', 'ethan', 'jeremy',
+                    'harold', 'keith', 'christian', 'roger', 'noah', 'gerald', 'carl', 'terry', 'sean', 'austin',
+                    'jennifer', 'linda', 'susan', 'jessica', 'sarah', 'karen', 'nancy', 'lisa', 'betty', 'margaret',
+                    'sandra', 'ashley', 'kimberly', 'emily', 'donna', 'michelle', 'dorothy', 'carol', 'amanda', 'melissa',
+                    'deborah', 'stephanie', 'rebecca', 'sharon', 'laura', 'cynthia', 'kathleen', 'amy', 'shirley', 'angela',
+                    'helen', 'anna', 'brenda', 'pamela', 'nicole', 'samantha', 'katherine', 'emma', 'ruth', 'christine',
+                    'catherine', 'debra', 'rachel', 'carolyn', 'janet', 'virginia', 'maria', 'heather', 'diane', 'julie',
+                    'joyce', 'victoria', 'olivia', 'kelly', 'christina', 'lauren', 'joan', 'evelyn', 'judith', 'megan'
+                ],
+                "11. Years (1900-2026)": [
+                    '1900', '1901', '1902', '1903', '1904', '1905', '1906', '1907', '1908', '1909',
+                    '1910', '1911', '1912', '1913', '1914', '1915', '1916', '1917', '1918', '1919',
+                    '1920', '1921', '1922', '1923', '1924', '1925', '1926', '1927', '1928', '1929',
+                    '1930', '1931', '1932', '1933', '1934', '1935', '1936', '1937', '1938', '1939',
+                    '1940', '1941', '1942', '1943', '1944', '1945', '1946', '1947', '1948', '1949',
+                    '1950', '1951', '1952', '1953', '1954', '1955', '1956', '1957', '1958', '1959',
+                    '1960', '1961', '1962', '1963', '1964', '1965', '1966', '1967', '1968', '1969',
+                    '1970', '1971', '1972', '1973', '1974', '1975', '1976', '1977', '1978', '1979',
+                    '1980', '1981', '1982', '1983', '1984', '1985', '1986', '1987', '1988', '1989',
+                    '1990', '1991', '1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999',
+                    '2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009',
+                    '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019',
+                    '2020', '2021', '2022', '2023', '2024', '2025', '2026'
+                ],
+                "12. Combinations & Suffixes": [
+                    '123', '1234', '12345', '007', '000', '111', '666', '777', '888', '999',
+                    '!', '@', '#', '$', '%', '&', '*', '?',
+                    'password123', 'admin123', 'secret123', 'welcome123', 'login123', 'user123', 'guest123',
+                    'password1234', 'admin1234', 'secret1234', 'welcome1234', 'login1234', 'user1234',
+                    'password!', 'admin!', 'secret!', 'welcome!', 'login!', 'user!', 'guest!',
+                    'password@', 'admin@', 'secret@', 'welcome@', 'login@', 'user@', 'guest@',
+                    'p@ssword', 'p@ssw0rd', 'P@ssword', 'P@ssw0rd', 'Pa$$word', 'admin@123', 'Password123'
+                ]
+            };
+
+            // Flatten dictionary for analysis logic
+            const COMMON_PASSWORDS = Object.values(DICTIONARY_CATEGORIES).flat();
 
             const KEYBOARD_PATTERNS = [
                 'qwertyuiop', 'asdfghjkl', 'zxcvbnm', 'qazwsxedcrfvtgbyhnujmikolp', '1234567890',
                 'qwe', 'wer', 'ert', 'rty', 'tyu', 'yui', 'uio', 'iop', 'asd', 'sdf', 'dfg', 'fgh', 'ghj', 'hjk', 'jkl',
                 'zxc', 'xcv', 'cvb', 'vbn', 'bnm', 'poiuytrewq', 'lkjhgfdsa', 'mnbvcxz',
                 'qaws', 'sxde', 'dcrf', 'fvgt', 'gbYH', 'hNju', 'jmIk', 'kiOl', 'loP',
-                'qaz', 'wsx', 'edc', 'rfv', 'tgb', 'yhn', 'ujm', 'ik,', 'ol.', 'p;/', // vertical
-                '1qaz', '2wsx', '3edc', '4rfv', '5tgb', '6yhn', '7ujm', '8ik,', '9ol.', '0p;/'
+                'qaz', 'wsx', 'edc', 'rfv', 'tgb', 'yhn', 'ujm', 'ik,', 'ol.', 'p;/', // vertical standard
+                '1qaz', '2wsx', '3edc', '4rfv', '5tgb', '6yhn', '7ujm', '8ik,', '9ol.', '0p;/',
+                'azerty', 'ytreza', 'qsdfgh', 'hgfdsq', 'wxcvbn', 'nbvcxw', // AZERTY specific
+                'qwertz', 'ztrewq', // QWERTZ specific
+                'hm', 'nu', 'jy', 'br', 'gv', 'dc', 'sx', 'az', // JIS vertical snippets
+                'qazwsxedc', 'wsxedcrfv', 'edcrfvtgb', 'rfvtgbyhn', 'tgbyhnujm', 'yhnujmik', 'ujmikolp', // Diagonals
+                'zaq1', 'xsw2', 'cde3', 'vfr4', 'bgt5', 'nhy6', 'mju7', 'mki8', 'lo9', 'p0' // Reverse diagonals
             ];
-            const SYMBOL_PATTERNS = ['!@#$%', '^&*()', ')_+', '}{[]', '?!#@', '123!', 'abc!'];
+            const SYMBOL_PATTERNS = ['!@#$%', '^&*()', ')_+', '}{[]', '?!#@', '123!', 'abc!', '<>?', ':"', '~`'];
             const REGEX_SEQUENCES_ALPHA = /(abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz)/gi;
             const REGEX_SEQUENCES_NUM = /(012|123|234|345|456|567|678|789)/g;
             const REGEX_REPEATED_3PLUS = /(.)\1\1+/g;
@@ -967,6 +1074,7 @@
                 let penalty = 0;
                 let foundPatterns = [];
                 const lowerPassword = password.toLowerCase();
+                // Check against FLATTENED array for performance in logic, but display structured array in UI
                 for (const common of COMMON_PASSWORDS) {
                     if (lowerPassword.includes(common.toLowerCase())) {
                         penalty += Math.min(25, common.length * 1.5 + (password.length === common.length ? 5: 0) );
@@ -1433,11 +1541,11 @@
                 });
             }
             
-            // New: Generate Internal Logic Disclosure
+            // New: Generate Structured Internal Logic Disclosure
             function renderLogicDetails() {
                 const container = document.getElementById('logicDetailsContent');
                 
-                const html = `
+                let html = `
                     <h6 class="fw-bold mt-3">1. 基本エントロピー計算</h6>
                     <div class="logic-code-block">BaseEntropy = Length * log2(CharacterPoolSize)</div>
                     
@@ -1454,13 +1562,37 @@
                         <li class="logic-list-item"><strong>単純な構造 (数字のみ/英字のみで4文字以上):</strong> -3bit (Entropy減少として処理)</li>
                     </ul>
 
-                    <h6 class="fw-bold mt-3">3. 内部辞書データ (Common Passwords List)</h6>
-                    <div class="logic-code-block">${JSON.stringify(COMMON_PASSWORDS, null, 2)}</div>
+                    <h6 class="fw-bold mt-3 mb-2">3. 内部辞書データ カテゴリ別一覧 (Total: ${Object.values(DICTIONARY_CATEGORIES).flat().length} Words)</h6>
+                    <div class="accordion" id="dictAccordion">
+                `;
+
+                // Loop through structured categories
+                let i = 0;
+                for (const [categoryName, words] of Object.entries(DICTIONARY_CATEGORIES)) {
+                    html += `
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDict${i}">
+                                    <span class="small fw-bold">${categoryName}</span>
+                                    <span class="category-badge">${words.length} words</span>
+                                </button>
+                            </h2>
+                            <div id="collapseDict${i}" class="accordion-collapse collapse" data-bs-parent="#dictAccordion">
+                                <div class="accordion-body p-2">
+                                    <div class="logic-code-block mb-0" style="max-height: 150px;">${JSON.stringify(words, null, 2)}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    i++;
+                }
+
+                html += `</div>
                     
-                    <h6 class="fw-bold mt-3">4. キーボードパターン (Keyboard Patterns)</h6>
+                    <h6 class="fw-bold mt-4">4. キーボードパターン (Keyboard Patterns) - <span class="text-primary">登録総数: ${KEYBOARD_PATTERNS.length} パターン</span></h6>
                     <div class="logic-code-block">${JSON.stringify(KEYBOARD_PATTERNS, null, 2)}</div>
                     
-                    <h6 class="fw-bold mt-3">5. 記号パターン (Symbol Patterns)</h6>
+                    <h6 class="fw-bold mt-3">5. 記号パターン (Symbol Patterns) - <span class="text-primary">登録総数: ${SYMBOL_PATTERNS.length} パターン</span></h6>
                     <div class="logic-code-block">${JSON.stringify(SYMBOL_PATTERNS, null, 2)}</div>
                 `;
                 
